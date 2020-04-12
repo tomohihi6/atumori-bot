@@ -17,7 +17,7 @@ const client = new line.Client(config);
 const app = express();
 
 // APIコールのためのクライアントインスタンスを作成
-const bot = new line.Client(line_config);
+const bot = new line.Client(config);
 
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
