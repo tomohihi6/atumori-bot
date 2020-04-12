@@ -39,18 +39,21 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     text: "どうもだなも!"
                 }));
             }
+            let numFlug = false;
             for(let i = 0; i < event.message.text.length; i++) {
                 let charCode = event.message.text.charAt(i);
                 if(charCode >= 48  && charCode <= 57){
-                    events_processed.push(bot.replyMessage(event.replyToken, {
-                        type: "text",
-                        text: "株価の記録だなもね？"
-                    }))
+                    numFlug = true;
                 }
             }
-            
+            if(numFlug) {
+                events_processed.push(bot.replyMessage(event.replyToken, {
+                    type: "text",
+                    text: "株価の記録だなもね？"
+                }))
+            }
         }
-        console.log(req.body);
+        console.log(req);
     });
 
     // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
