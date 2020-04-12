@@ -26,8 +26,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
     // すべてのイベント処理のプロミスを格納する配列。
     let events_processed = [];
-    console.log(aiueo / 1);
-    console.log(29/1);
+
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
@@ -39,12 +38,17 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     type: "text",
                     text: "どうもだなも!"
                 }));
-            }else if(event.message.text / 1){
-                events_processed.push(bot.replyMessage(event.replyToken, {
-                    type: "text",
-                    text: "株価の記録だなもね？"
-                }))
             }
+            for(let i = 0; i < event.message.text.length; i++) {
+                let charCode = event.message.text.charAt(i);
+                if(charCode >= 48  && charCode <= 57){
+                    events_processed.push(bot.replyMessage(event.replyToken, {
+                        type: "text",
+                        text: "株価の記録だなもね？"
+                    }))
+                }
+            }
+            
         }
         console.log(req.body);
     });
