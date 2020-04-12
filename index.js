@@ -134,6 +134,8 @@ function getUserName(userID) {
     .then((profile) => {
         let name = profile.displayName
         console.log(profile.displayName)
+        console.log(name)
+        console.log(typeof name)
         return name;
     })
     .catch((err) => {
