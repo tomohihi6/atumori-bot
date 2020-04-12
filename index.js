@@ -32,13 +32,40 @@ app.post('/callback', line.middleware(config), (req, res) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
         if (event.type == "message" && event.message.type == "text"){
             // ユーザーからのテキストメッセージが「こんにちは」だった場合のみ反応。
-            if (event.message.text == "こんにちは"){
-                // replyMessage()で返信し、そのプロミスをevents_processedに追加。
-                events_processed.push(bot.replyMessage(event.replyToken, {
-                    type: "text",
-                    text: "どうもだなも!"
-                }));
+            switch (event.message.text) {
+                case "こんにちは":
+                    events_processed.push(bot.replyMessage(event.replyToken, {
+                        type: "text",
+                        text: "どうもだなも!"
+                    }));
+                    break;
+                case "今の時刻は？" && "今って?" && "今日って何日":
+                    var date = new Date();
+                    var month = date.getMonth() + 1 ;
+                    var day = date.getDate() ;
+                    var hour = date.getHours() ;
+                    var minute = date.getMinutes() ;
+                    var dayOfWeekStr = [ "日", "月", "火", "水", "木", "金", "土" ][dayOfWeek] ;
+                    const time = `今は${month}月${day}日の${dayOfWeekStr}曜日${hour}時${minute}分だなも`
+                    events_processed.push(bot.replyMessage(event.replyToken, {
+                        type: "text",
+                        text: time
+                    }))
+                    break;
+                case "しずえは？":
+                    events_processed.push(bot.replyMessage(event.replyToken, {
+                        type: "text",
+                        text: "ノーコメントだなも"
+                    }));
+                    break;
+                 default :
+                    events_processed.push(bot.replyMessage(event.replyToken, {
+                        type: "text",
+                        text: "会話実装めんどくさすぎてはげそうだなも!"
+                    }));  
+                    break;
             }
+
             let numFlug = true;
             for(let i = 0; i < event.message.text.length; i++) {
                 numFlug = false;
@@ -49,7 +76,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             }
             if(numFlug) {
-                console.log("フラグ立ってるよ")
                 events_processed.push(bot.replyMessage(event.replyToken, {
                     type: "text",
                     text: "株価の記録だなもね？"
