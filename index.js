@@ -2,6 +2,7 @@
 
 const line = require('@line/bot-sdk');
 const express = require('express');
+const async = require('async');
 
 // create LINE SDK config from env variables
 const config = {
@@ -29,12 +30,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
     var name = "入ってない";
 
     // イベントオブジェクトを順次処理。
-    const promise = new Promise((resolve, reject) => {
-        name = getUserName(req.body.events[0].source.userId);
-        resolve();
-    })
-    promise.then(() => {
-        req.body.events.forEach((event) => {
+    req.body.events.forEach((event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
         if (event.type == "message" && event.message.type == "text"){
             // ユーザーからのテキストメッセージが「こんにちは」だった場合のみ反応。
@@ -68,19 +64,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     break;
 
                  default :
-                    console.log(`名前は${name}`)
-                    const tempTexts = [
-                        "会話実装めんどくさすぎてはげそうだなも!",
-                        "ぼくと話す前に早く借金返せだなも！",
-                        "だなも！",
-                        "今回の増築代金として，1000000ベル，ローンを組ませていただくだなも！",
-                        `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
-                    ]
-                    let random = Math.floor( Math.random() * tempTexts.length );
-                    events_processed.push(bot.replyMessage(event.replyToken, {
-                        type: "text",
-                        text: tempTexts[random]
-                    }));  
+                    tempResponse(event);
                     break;
             }
 
@@ -102,8 +86,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }
         console.log(req.body);
         console.log(req.body.events[0].source)
-    });})
-    
+    });
 
     // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
     Promise.all(events_processed).then(
@@ -132,14 +115,29 @@ function getUserName(userID) {
     client.getProfile(userId)
     .then((profile) => {
         let name = profile.displayName
-        console.log(profile.displayName)
-        console.log(name)
         return name;
     })
     .catch((err) => {
         // error handling
         console.log(err.body)
     });
+}
+
+async function tempResponse(e) {
+    let name = await getUserName(e.source.userId);
+    console.log(`名前は${name}`)
+    const tempTexts = [
+        "会話実装めんどくさすぎてはげそうだなも!",
+        "ぼくと話す前に早く借金返せだなも！",
+        "だなも！",
+        "今回の増築代金として，1000000ベル，ローンを組ませていただくだなも！",
+        `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
+    ]
+    let random = Math.floor( Math.random() * tempTexts.length );
+    events_processed.push(bot.replyMessage(event.replyToken, {
+        type: "text",
+        text: tempTexts[random]
+    }));  
 }
 
 // listen on port
