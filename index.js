@@ -33,7 +33,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 // replyMessage()で返信し、そのプロミスをevents_processedに追加。
                 events_processed.push(bot.replyMessage(event.replyToken, {
                     type: "text",
-                    text: "どうもだなも"
+                    text: "どうもだなも!"
                 }));
             }
         }
