@@ -14,12 +14,22 @@ const client = new line.Client(config);
 
 // create Express app
 // about Express itself: https://expressjs.com/
-server.listen(process.env.PORT || 3000);
+const app = express();
 
+// register a webhook handler with middleware
+// about the middleware, please refer to doc
+app.post('/callback', line.middleware(config), (req, res) => {
+  Promise
+    .all(req.body.events.map(handleEvent))
+    .then((result) => res.json(result))
+    .catch((err) => {
+      console.error(err);
+      res.status(500).end();
+    });
+});
 
-// -----------------------------------------------------------------------------
-// ルーター設定
-server.post('/callback', line.middleware(line_config), (req, res, next) => {
-    res.sendStatus(200);
-    console.log(req.body);
+// listen on port
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`listening on ${port}`);
 });
