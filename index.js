@@ -129,9 +129,9 @@ function handleEvent(event) {
   return client.replyMessage(event.replyToken, echo);
 }
 
-async function getUserName(userID) {
+function getUserName(userID) {
     const userId = userID;
-    await client.getProfile(userId)
+    client.getProfile(userId)
     .then((profile) => {
         console.log(profile)
         let name = profile.displayName
