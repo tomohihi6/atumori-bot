@@ -20,14 +20,14 @@ const app = express();
 // APIコールのためのクライアントインスタンスを作成
 const bot = new line.Client(config);
 
+// すべてのイベント処理のプロミスを格納する配列。
+let events_processed = [];
+
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
 app.post('/callback', line.middleware(config), (req, res) => {
     res.sendStatus(200);
 
-    // すべてのイベント処理のプロミスを格納する配列。
-    let events_processed = [];
-    var name = "入ってない";
 
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
