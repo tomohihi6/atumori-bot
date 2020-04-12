@@ -31,7 +31,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
     req.body.events.forEach((event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
         if (event.type == "message" && event.message.type == "text"){
-            getUserName(event.source.userId);
+            name = getUserName(event.source.userId);
             // ユーザーからのテキストメッセージが「こんにちは」だった場合のみ反応。
             switch (event.message.text) {
                 case "こんにちは":
