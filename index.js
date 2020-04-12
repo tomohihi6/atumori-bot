@@ -36,7 +36,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
             let numFlug = true;
             for(let i = 0; i < event.message.text.length; i++) {
                 let charCode = event.message.text.charCodeAt(i);
-                if(charCode < 48  && charCode > 57){
+                if(charCode < 48  || charCode > 57){
                     numFlug = false;
                     break;
                 }
