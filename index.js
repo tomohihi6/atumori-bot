@@ -27,11 +27,16 @@ app.post('/callback', line.middleware(config), (req, res) => {
     // すべてのイベント処理のプロミスを格納する配列。
     let events_processed = [];
     var name = "入ってない";
-    const tempTexts = [];
+
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
+        let promise = new Promise((resolve, reject) => {
+            name = getUserName(event.source.userId);
+            resolve();
+         });
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
-        if (event.type == "message" && event.message.type == "text"){
+        promise.then(() => 
+        {if (event.type == "message" && event.message.type == "text"){
             // ユーザーからのテキストメッセージが「こんにちは」だった場合のみ反応。
             switch (event.message.text) {
                 case "こんにちは":
@@ -63,13 +68,15 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     break;
 
                  default :
-                 let promise = new Promise((resolve, reject) => {
-                    name = getUserName(event.source.userId);
-                    resolve();
-                 });
                  promise.then(() => {
                     console.log(`名前は${name}`)
-                    
+                    const tempTexts = [
+                        "会話実装めんどくさすぎてはげそうだなも!",
+                        "ぼくと話す前に早く借金返せだなも！",
+                        "だなも！",
+                        "今回の増築代金として，1000000ベル，ローンを組ませていただくだなも！",
+                        `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
+                    ]
                     let random = Math.floor( Math.random() * tempTexts.length );
                     events_processed.push(bot.replyMessage(event.replyToken, {
                         type: "text",
@@ -105,7 +112,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
             console.log(`${response.length} event(s) processed.`);
         }
     );
-
+})
+        
 });
 
 // event handler
@@ -129,14 +137,6 @@ function getUserName(userID) {
         let name = profile.displayName
         console.log(profile.displayName)
         console.log(name)
-        console.log(typeof name)
-        tempTexts = [
-            "会話実装めんどくさすぎてはげそうだなも!",
-            "ぼくと話す前に早く借金返せだなも！",
-            "だなも！",
-            "今回の増築代金として，1000000ベル，ローンを組ませていただくだなも！",
-            `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
-        ]
         return name;
     })
     .catch((err) => {
