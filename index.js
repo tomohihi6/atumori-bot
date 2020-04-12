@@ -117,7 +117,7 @@ async function getUserName(userID) {
 }
 
 async function tempResponse(e) {
-    let name = getUserName(e.source.userId);
+    let name = await getUserName(e.source.userId);
     console.log(`名前は${name}`)
     const tempTexts = [
         "会話実装めんどくさすぎてはげそうだなも!",
