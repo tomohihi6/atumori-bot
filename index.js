@@ -110,17 +110,10 @@ function handleEvent(event) {
   return client.replyMessage(event.replyToken, echo);
 }
 
-function getUserName(userID) {
+async function getUserName(userID) {
     const userId = userID;
-    client.getProfile(userId)
-    .then((profile) => {
-        let name = profile.displayName
-        return name;
-    })
-    .catch((err) => {
-        // error handling
-        console.log(err.body)
-    });
+    const pro = await client.getProfile(userId)
+    return pro.displayName;
 }
 
 async function tempResponse(e) {
