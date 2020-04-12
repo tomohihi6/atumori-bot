@@ -41,7 +41,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
             }
             let numFlug = false;
             for(let i = 0; i < event.message.text.length; i++) {
-                let charCode = event.message.text.charAt(i);
+                let charCode = event.message.text.charCodeAt(i);
                 if(charCode >= 48  && charCode <= 57){
                     numFlug = true;
                     console.log("これは数字です")
