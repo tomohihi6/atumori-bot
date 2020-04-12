@@ -81,7 +81,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     ]
                     events_processed.push(bot.replyMessage(event.replyToken, {
                         type: "text",
-                        text: tempTexts[0]
+                        text: name
                     }));  
                     break;
             }
