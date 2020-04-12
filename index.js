@@ -30,13 +30,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
-        let promise = new Promise((resolve, reject) => {
-            name = getUserName(event.source.userId);
-            resolve();
-         });
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
-        promise.then(() => 
-        {if (event.type == "message" && event.message.type == "text"){
+        if (event.type == "message" && event.message.type == "text"){
             // ユーザーからのテキストメッセージが「こんにちは」だった場合のみ反応。
             switch (event.message.text) {
                 case "こんにちは":
@@ -68,7 +63,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     break;
 
                  default :
-                 promise.then(() => {
                     console.log(`名前は${name}`)
                     const tempTexts = [
                         "会話実装めんどくさすぎてはげそうだなも!",
@@ -82,7 +76,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         type: "text",
                         text: tempTexts[random]
                     }));  
-                 });
                     break;
             }
 
@@ -112,8 +105,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
             console.log(`${response.length} event(s) processed.`);
         }
     );
-})
-        
 });
 
 // event handler
