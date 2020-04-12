@@ -31,6 +31,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
     req.body.events.forEach((event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
         if (event.type == "message" && event.message.type == "text"){
+            getUserName(event.message.source);
             // ユーザーからのテキストメッセージが「こんにちは」だった場合のみ反応。
             switch (event.message.text) {
                 case "こんにちは":
@@ -62,16 +63,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     break;
 
                  default :
-                    const userId = event.source.userId;
-                    client.getProfile(userId)
-                    .then((profile) => {
-                        name = profile.displayName;
-                        console.log(profile.displayName)
-                    })
-                    .catch((err) => {
-                        // error handling
-                        console.log(err.body)
-                    });
+                    
                     const tempTexts = [
                         "会話実装めんどくさすぎてはげそうだなも!",
                         "ぼくと話す前に早く借金返せだなも！",
@@ -129,6 +121,19 @@ function handleEvent(event) {
 
   // use reply API
   return client.replyMessage(event.replyToken, echo);
+}
+
+function getUserName(userID) {
+    const userId = userID;
+    client.getProfile(userId)
+    .then((profile) => {
+        console.log(profile.displayName)
+        return profile.displayName;
+    })
+    .catch((err) => {
+        // error handling
+        console.log(err.body)
+    });
 }
 
 // listen on port
