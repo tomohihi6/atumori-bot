@@ -27,7 +27,23 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
     // すべてのイベント処理のプロミスを格納する配列。
     let events_processed = [];
-
+    
+    async function tempResponse(e) {
+        let name = await getUserName(e.source.userId);
+        console.log(`名前は${name}`)
+        const tempTexts = [
+            "会話実装めんどくさすぎてはげそうだなも!",
+            "ぼくと話す前に早く借金返せだなも！",
+            "だなも！",
+            "今回の増築代金として，1000000ベル，ローンを組ませていただくだなも！",
+            `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
+        ]
+        let random = Math.floor( Math.random() * tempTexts.length );
+        events_processed.push(bot.replyMessage(e.replyToken, {
+            type: "text",
+            text: tempTexts[random]
+        }));  
+    }
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
@@ -114,23 +130,6 @@ async function getUserName(userID) {
     const userId = userID;
     const pro = await client.getProfile(userId)
     return pro.displayName;
-}
-
-async function tempResponse(e) {
-    let name = await getUserName(e.source.userId);
-    console.log(`名前は${name}`)
-    const tempTexts = [
-        "会話実装めんどくさすぎてはげそうだなも!",
-        "ぼくと話す前に早く借金返せだなも！",
-        "だなも！",
-        "今回の増築代金として，1000000ベル，ローンを組ませていただくだなも！",
-        `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
-    ]
-    let random = Math.floor( Math.random() * tempTexts.length );
-    events_processed.push(bot.replyMessage(e.replyToken, {
-        type: "text",
-        text: tempTexts[random]
-    }));  
 }
 
 // listen on port
