@@ -33,22 +33,19 @@ app.post('/callback', line.middleware(config), (req, res) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
         if (event.type == "message" && event.message.type == "text"){
             // ユーザーからのテキストメッセージが「こんにちは」だった場合のみ反応。
-            if(event.message.text.charCodeAt(0) >= 48  && event.message.text.charCodeAt(0) <= 57) {
-                let numFlug = true;
-                for(let i = 0; i < event.message.text.length; i++) {
+            let numFlug = true;
+            for(let i = 0; i < event.message.text.length; i++) {
+                let charCode = event.message.text.charCodeAt(i);
+                if(charCode < 48  && charCode > 57){
                     numFlug = false;
-                    let charCode = event.message.text.charCodeAt(i);
-                    if(charCode >= 48  && charCode <= 57){
-                        numFlug = true;
-                        console.log("これは数字です")
-                    }
+                    break;
                 }
-                if(numFlug) {
-                    events_processed.push(bot.replyMessage(event.replyToken, {
-                        type: "text",
-                        text: "株価の記録だなもね？"
-                    }))
-                }
+            }
+            if(numFlug) {
+                events_processed.push(bot.replyMessage(event.replyToken, {
+                    type: "text",
+                    text: "株価の記録だなもね？"
+                }))
             } else {
                 switch (event.message.text) {
                     case "こんにちは":
@@ -64,7 +61,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         var day = date.getDate() ;
                         var hour = date.getHours() ;
                         var minute = date.getMinutes() ;
-                        var dayOfWeek = date.getDayy();
+                        var dayOfWeek = date.getDay();
                         var dayOfWeekStr = [ "日", "月", "火", "水", "木", "金", "土" ][dayOfWeek] ;
                         const time = `今は${month}月${day}日の${dayOfWeekStr}曜日${hour}時${minute}分だなも`
                         events_processed.push(bot.replyMessage(event.replyToken, {
