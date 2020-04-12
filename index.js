@@ -63,7 +63,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     break;
 
                  default :
-                    
+                    console.log(`名前は${name}`)
                     const tempTexts = [
                         "会話実装めんどくさすぎてはげそうだなも!",
                         "ぼくと話す前に早く借金返せだなも！",
