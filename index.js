@@ -39,6 +39,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         text: "どうもだなも!"
                     }));
                     break;
+
                 case "今の時刻は？" || "今って?" || "今日って何日":
                     var date = new Date();
                     var month = date.getMonth() + 1 ;
@@ -52,36 +53,36 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         text: time
                     }))
                     break;
+
                 case "しずえは？":
                     events_processed.push(bot.replyMessage(event.replyToken, {
                         type: "text",
                         text: "ノーコメントだなも"
                     }));
                     break;
+
                  default :
-                    let name;
-                    client.getProfile('<userId>')
+                    const userId = event.source.userId;
+                    const name;
+                    client.getProfile(userId)
                     .then((profile) => {
                         name = profile.displayName;
-                    console.log(profile.displayName);
-                    console.log(profile.userId);
-                    console.log(profile.pictureUrl);
-                    console.log(profile.statusMessage);
                     })
                     .catch((err) => {
-                    // error handling
-                    console.log(err)
+                        // error handling
+                        console.log(err)
                     });
                     const tempTexts = [
                         "会話実装めんどくさすぎてはげそうだなも!",
                         "ぼくと話す前に早く借金返せだなも！",
                         "だなも！",
                         "今回の増築代金として，1000000ベル，ローンを組ませていただくだなも！",
-                        "ぼくに騙されて~さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも"
+                        `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
                     ]
+                    let random = Math.floor( Math.random() * tempTexts.length );
                     events_processed.push(bot.replyMessage(event.replyToken, {
                         type: "text",
-                        text: name
+                        text: tempTexts[random]
                     }));  
                     break;
             }
