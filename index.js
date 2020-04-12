@@ -59,8 +59,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     }));
                     break;
                  default :
+                    let name;
                     client.getProfile('<userId>')
                     .then((profile) => {
+                        name = profile.displayName;
                     console.log(profile.displayName);
                     console.log(profile.userId);
                     console.log(profile.pictureUrl);
