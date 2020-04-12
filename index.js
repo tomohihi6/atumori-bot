@@ -27,7 +27,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
     // すべてのイベント処理のプロミスを格納する配列。
     let events_processed = [];
-    
+
     async function tempResponse(e) {
         let name = await getUserName(e.source.userId);
         console.log(`名前は${name}`)
@@ -71,8 +71,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         }));
                         break;
     
-                    case "今の時刻は？" || "今って?" || "今日って何日":
-                        var date = new Date().toLocaleString({ timeZone: 'Asia/Tokyo' })
+                    case "今の時刻は？":
+                        var date = new Date()
                         var month = date.getMonth() + 1 ;
                         var day = date.getDate() ;
                         var hour = date.getHours() ;
