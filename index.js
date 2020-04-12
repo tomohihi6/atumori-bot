@@ -68,6 +68,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     })
                     .catch((err) => {
                     // error handling
+                    console.log(err)
                     });
                     const tempTexts = [
                         "会話実装めんどくさすぎてはげそうだなも!",
