@@ -133,8 +133,8 @@ function getUserName(userID) {
     client.getProfile(userId)
     .then((profile) => {
         let name = profile.displayName
-        .then(()=> {console.log(profile.displayName)})
-        .then(() => {return name})
+        console.log(profile.displayName)
+        return name;
     })
     .catch((err) => {
         // error handling
