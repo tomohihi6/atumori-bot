@@ -26,7 +26,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
     // すべてのイベント処理のプロミスを格納する配列。
     let events_processed = [];
-    let name = "入ってない";
+    var name = "入ってない";
 
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
@@ -82,7 +82,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         type: "text",
                         text: tempTexts[random]
                     }));  
-                 })
+                 });
                     break;
             }
 
@@ -129,12 +129,12 @@ function handleEvent(event) {
   return client.replyMessage(event.replyToken, echo);
 }
 
-function getUserName(userID) {
+async function getUserName(userID) {
     const userId = userID;
-    client.getProfile(userId)
+    await client.getProfile(userId)
     .then((profile) => {
         console.log(profile.displayName)
-        return profile.displayName;
+        return parseString(profile.displayName);
     })
     .catch((err) => {
         // error handling
