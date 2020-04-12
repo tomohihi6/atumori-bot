@@ -20,14 +20,32 @@ const app = express();
 // about the middleware, please refer to doc
 app.post('/callback', line.middleware(config), (req, res) => {
     res.sendStatus(200);
-    console.log(req.body);
-//   Promise
-//     .all(req.body.events.map(handleEvent))
-//     .then((result) => res.json(result))
-//     .catch((err) => {
-//       console.error(err);
-//       res.status(500).end();
-//     });
+
+    // すべてのイベント処理のプロミスを格納する配列。
+    let events_processed = [];
+
+    // イベントオブジェクトを順次処理。
+    req.body.events.forEach((event) => {
+        // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
+        if (event.type == "message" && event.message.type == "text"){
+            // ユーザーからのテキストメッセージが「こんにちは」だった場合のみ反応。
+            if (event.message.text == "こんにちは"){
+                // replyMessage()で返信し、そのプロミスをevents_processedに追加。
+                events_processed.push(bot.replyMessage(event.replyToken, {
+                    type: "text",
+                    text: "どうもだなも"
+                }));
+            }
+        }
+    });
+
+    // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
+    Promise.all(events_processed).then(
+        (response) => {
+            console.log(`${response.length} event(s) processed.`);
+        }
+    );
+
 });
 
 // event handler
