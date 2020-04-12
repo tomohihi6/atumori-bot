@@ -64,7 +64,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
                  default :
                  let promise = new Promise((resolve, reject) => {
-                    //name = getUserName(event.source.userId);
+                    name = getUserName(event.source.userId);
                     resolve();
                  });
                  promise.then(() => {
@@ -134,7 +134,8 @@ async function getUserName(userID) {
     await client.getProfile(userId)
     .then((profile) => {
         console.log(profile)
-        return profile.displayName;
+        let name = profile.displayName
+        return name;
     })
     .catch((err) => {
         // error handling
