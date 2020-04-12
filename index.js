@@ -63,7 +63,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
                  default :
                     const userId = event.source.userId;
-                    const name;
+                    const name = "";
                     client.getProfile(userId)
                     .then((profile) => {
                         name = profile.displayName;
