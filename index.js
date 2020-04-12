@@ -26,7 +26,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
     // すべてのイベント処理のプロミスを格納する配列。
     let events_processed = [];
-
+    let name = "";
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
@@ -63,7 +63,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
                  default :
                     const userId = event.source.userId;
-                    let name = "";
                     client.getProfile(userId)
                     .then((profile) => {
                         name = profile.displayName;
