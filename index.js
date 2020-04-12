@@ -39,7 +39,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         text: "どうもだなも!"
                     }));
                     break;
-                case "今の時刻は？" && "今って?" && "今日って何日":
+                case "今の時刻は？" || "今って?" || "今日って何日":
                     var date = new Date();
                     var month = date.getMonth() + 1 ;
                     var day = date.getDate() ;
@@ -59,9 +59,26 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     }));
                     break;
                  default :
+                    client.getProfile('<userId>')
+                    .then((profile) => {
+                    console.log(profile.displayName);
+                    console.log(profile.userId);
+                    console.log(profile.pictureUrl);
+                    console.log(profile.statusMessage);
+                    })
+                    .catch((err) => {
+                    // error handling
+                    });
+                    const tempTexts = [
+                        "会話実装めんどくさすぎてはげそうだなも!",
+                        "ぼくと話す前に早く借金返せだなも！",
+                        "だなも！",
+                        "今回の増築代金として，1000000ベル，ローンを組ませていただくだなも！",
+                        "ぼくに騙されて~さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも"
+                    ]
                     events_processed.push(bot.replyMessage(event.replyToken, {
                         type: "text",
-                        text: "会話実装めんどくさすぎてはげそうだなも!"
+                        text: tempTexts[0]
                     }));  
                     break;
             }
