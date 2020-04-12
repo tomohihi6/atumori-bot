@@ -134,7 +134,7 @@ async function tempResponse(e) {
         `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
     ]
     let random = Math.floor( Math.random() * tempTexts.length );
-    events_processed.push(bot.replyMessage(event.replyToken, {
+    events_processed.push(bot.replyMessage(e.replyToken, {
         type: "text",
         text: tempTexts[random]
     }));  
