@@ -44,16 +44,18 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 let charCode = event.message.text.charAt(i);
                 if(charCode >= 48  && charCode <= 57){
                     numFlug = true;
+                    console.log("これは数字です")
                 }
             }
             if(numFlug) {
+                console.log("フラグ立ってるよ")
                 events_processed.push(bot.replyMessage(event.replyToken, {
                     type: "text",
                     text: "株価の記録だなもね？"
                 }))
             }
         }
-        console.log(req);
+        console.log(req.body);
     });
 
     // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
