@@ -48,6 +48,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     var day = date.getDate() ;
                     var hour = date.getHours() ;
                     var minute = date.getMinutes() ;
+                    var dayOfWeek = date.getDate();
                     var dayOfWeekStr = [ "日", "月", "火", "水", "木", "金", "土" ][dayOfWeek] ;
                     const time = `今は${month}月${day}日の${dayOfWeekStr}曜日${hour}時${minute}分だなも`
                     events_processed.push(bot.replyMessage(event.replyToken, {
@@ -64,8 +65,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     break;
 
                  default :
-                    tempResponse(event);
-                    break;
+                    tempResponse(event).then(() => {break});
+                    
             }
 
             let numFlug = true;
