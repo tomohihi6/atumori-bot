@@ -27,7 +27,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
     // すべてのイベント処理のプロミスを格納する配列。
     let events_processed = [];
     let name = "入ってない";
-    
+
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
@@ -65,6 +65,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                  default :
                  let promise = new Promise((resolve, reject) => {
                     name = getUserName(event.source.userId);
+                    resolve();
                  });
                  promise.then(() => {
                     console.log(`名前は${name}`)
