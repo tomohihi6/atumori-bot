@@ -20,70 +20,71 @@ const app = express();
 // APIコールのためのクライアントインスタンスを作成
 const bot = new line.Client(config);
 
-// すべてのイベント処理のプロミスを格納する配列。
-let events_processed = [];
-
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
 app.post('/callback', line.middleware(config), (req, res) => {
     res.sendStatus(200);
 
+    // すべてのイベント処理のプロミスを格納する配列。
+    let events_processed = [];
 
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
         if (event.type == "message" && event.message.type == "text"){
             // ユーザーからのテキストメッセージが「こんにちは」だった場合のみ反応。
-            switch (event.message.text) {
-                case "こんにちは":
-                    events_processed.push(bot.replyMessage(event.replyToken, {
-                        type: "text",
-                        text: "どうもだなも!"
-                    }));
-                    break;
-
-                case "今の時刻は？" || "今って?" || "今日って何日":
-                    var date = new Date();
-                    var month = date.getMonth() + 1 ;
-                    var day = date.getDate() ;
-                    var hour = date.getHours() ;
-                    var minute = date.getMinutes() ;
-                    var dayOfWeek = date.getDate();
-                    var dayOfWeekStr = [ "日", "月", "火", "水", "木", "金", "土" ][dayOfWeek] ;
-                    const time = `今は${month}月${day}日の${dayOfWeekStr}曜日${hour}時${minute}分だなも`
-                    events_processed.push(bot.replyMessage(event.replyToken, {
-                        type: "text",
-                        text: time
-                    }))
-                    break;
-
-                case "しずえは？":
-                    events_processed.push(bot.replyMessage(event.replyToken, {
-                        type: "text",
-                        text: "ノーコメントだなも"
-                    }));
-                    break;
-
-                 default :
-                    tempResponse(event).then(() => {console.log("イベント終了")})
-                    break;
-                    
-            }
-
-            let numFlug = true;
-            for(let i = 0; i < event.message.text.length; i++) {
-                numFlug = false;
-                let charCode = event.message.text.charCodeAt(i);
-                if(charCode >= 48  && charCode <= 57){
-                    numFlug = true;
-                    console.log("これは数字です")
+            if(event.message.text.charCodeAt(0) >= 48  && event.message.text.charCodeAt(0) <= 57) {
+                let numFlug = true;
+                for(let i = 0; i < event.message.text.length; i++) {
+                    numFlug = false;
+                    let charCode = event.message.text.charCodeAt(i);
+                    if(charCode >= 48  && charCode <= 57){
+                        numFlug = true;
+                        console.log("これは数字です")
+                    }
                 }
-            }
-            if(numFlug) {
-                events_processed.push(bot.replyMessage(event.replyToken, {
-                    type: "text",
-                    text: "株価の記録だなもね？"
-                }))
+                if(numFlug) {
+                    events_processed.push(bot.replyMessage(event.replyToken, {
+                        type: "text",
+                        text: "株価の記録だなもね？"
+                    }))
+                }
+            } else {
+                switch (event.message.text) {
+                    case "こんにちは":
+                        events_processed.push(bot.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: "どうもだなも!"
+                        }));
+                        break;
+    
+                    case "今の時刻は？" || "今って?" || "今日って何日":
+                        var date = new Date().toLocaleString({ timeZone: 'Asia/Tokyo' })
+                        var month = date.getMonth() + 1 ;
+                        var day = date.getDate() ;
+                        var hour = date.getHours() ;
+                        var minute = date.getMinutes() ;
+                        var dayOfWeek = date.getDayy();
+                        var dayOfWeekStr = [ "日", "月", "火", "水", "木", "金", "土" ][dayOfWeek] ;
+                        const time = `今は${month}月${day}日の${dayOfWeekStr}曜日${hour}時${minute}分だなも`
+                        events_processed.push(bot.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: time
+                        }))
+                        break;
+    
+                    case "しずえは？":
+                        events_processed.push(bot.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: "ノーコメントだなも"
+                        }));
+                        break;
+    
+                     default :
+                        tempResponse(event).then(() => {console.log("イベント終了")})
+                        break;
+                        
+                }
             }
         }
         console.log(req.body);
