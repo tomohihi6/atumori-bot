@@ -79,6 +79,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         "今回の増築代金として，1000000ベル，ローンを組ませていただくだなも！",
                         `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
                     ]
+                    console.log(name)
                     let random = Math.floor( Math.random() * tempTexts.length );
                     events_processed.push(bot.replyMessage(event.replyToken, {
                         type: "text",
