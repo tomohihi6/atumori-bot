@@ -26,12 +26,12 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
     // すべてのイベント処理のプロミスを格納する配列。
     let events_processed = [];
-    let name = "";
+
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
         if (event.type == "message" && event.message.type == "text"){
-            name = getUserName(event.source.userId);
+            let name = getUserName(event.source.userId);
             // ユーザーからのテキストメッセージが「こんにちは」だった場合のみ反応。
             switch (event.message.text) {
                 case "こんにちは":
