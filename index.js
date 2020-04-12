@@ -67,10 +67,11 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     client.getProfile(userId)
                     .then((profile) => {
                         name = profile.displayName;
+                        console.log(profile.displayName)
                     })
                     .catch((err) => {
                         // error handling
-                        console.log(err)
+                        console.log(err.body)
                     });
                     const tempTexts = [
                         "会話実装めんどくさすぎてはげそうだなも!",
@@ -104,6 +105,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
             }
         }
         console.log(req.body);
+        console.log(req.body.events[0].source)
     });
 
     // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
