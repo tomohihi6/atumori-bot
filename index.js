@@ -116,7 +116,7 @@ async function getUserName(userID) {
     return pro.displayName;
 }
 
-function tempResponse(e) {
+async function tempResponse(e) {
     let name = getUserName(e.source.userId);
     console.log(`名前は${name}`)
     const tempTexts = [
