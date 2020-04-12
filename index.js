@@ -65,7 +65,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     break;
 
                  default :
-                    tempResponse(event).then(() => {break});
+                    tempResponse(event).then(() => {console.log("イベント終了")})
+                    break;
                     
             }
 
