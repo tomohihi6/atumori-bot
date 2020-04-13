@@ -3,6 +3,7 @@
 const line = require('@line/client-sdk');
 const express = require('express');
 const async = require('async');
+const database = require('./database')
 
 // create LINE SDK config from env variables
 const config = {
@@ -19,7 +20,7 @@ const client = new line.Client(config);
 
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
-app.post('/callback', line.middleware(config), (req, res) => {
+app.post('/callback', line.middleware(config), async (req, res) => {
     res.sendStatus(200);
 
     // すべてのイベント処理のプロミスを格納する配列。
@@ -63,7 +64,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 let date = new Date();
                 let hour = date.getHours();
                 let ampm = (hour < 12) ? "午前" : "午後";
-                
+
                 events_processed.push(client.replyMessage(event.replyToken, {
                     type: "text",
                     text: "株価を記録しただなも"
@@ -100,7 +101,14 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             text: "ノーコメントだなも"
                         }));
                         break;
-    
+                    
+                    case "データベース":
+                        const result = await  db.query('SELECT * FROM stock_price_tb')   
+                        console.log(result);
+                        events_processed.push(client.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: result
+                        }));
                      default :
                         tempResponse(event).then(() => {console.log("イベント終了")})
                         break;
@@ -138,10 +146,6 @@ async function getUserName(userID) {
     const userId = userID;
     const pro = await client.getProfile(userId)
     return pro.displayName;
-}
-
-function getCurrentTime() {
-    const 
 }
 
 // listen on port
