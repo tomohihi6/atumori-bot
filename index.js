@@ -5,7 +5,7 @@ const express = require('express');
 const async = require('async');
 const { Client } = require('pg');
 
-const client = new Client({
+const dbClient = new Client({
   connectionString: process.env.DATABASE_URL,
   ssl: true,
 });
@@ -25,6 +25,18 @@ const app = express();
 // APIコールのためのクライアントインスタンスを作成
 const client = new line.Client(config);
 const db = new database
+
+async function databaseTest() {
+    dbClient.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
+        if (err) throw err;
+        for (let row of res.rows) {
+          console.log(JSON.stringify(row));
+        }
+        dbClient.end();
+      });
+
+}
+
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
 app.post('/callback', line.middleware(config), (req, res) => {
@@ -50,17 +62,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
             type: "text",
             text: tempTexts[random]
         }));  
-    }
-
-    async function databaseTest() {
-        client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
-            if (err) throw err;
-            for (let row of res.rows) {
-              console.log(JSON.stringify(row));
-            }
-            client.end();
-          });
-          
     }
 
     // イベントオブジェクトを順次処理。
