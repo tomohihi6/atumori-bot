@@ -20,7 +20,7 @@ const client = new line.Client(config);
 const db = new database
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
-app.post('/callback', line.middleware(config), async (req, res) => {
+app.post('/callback', line.middleware(config), (req, res) => {
     res.sendStatus(200);
 
     // すべてのイベント処理のプロミスを格納する配列。
@@ -45,8 +45,17 @@ app.post('/callback', line.middleware(config), async (req, res) => {
         }));  
     }
 
+    async function databaseTest() {
+        const result = await db.query('SELECT * FROM stock_price_tb')   
+        console.log(result);
+        events_processed.push(client.replyMessage(event.replyToken, {
+            type: "text",
+            text: result
+        }));
+    }
+
     // イベントオブジェクトを順次処理。
-    req.body.events.forEach(async (event) => {
+    req.body.events.forEach((event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
         if (event.type == "message" && event.message.type == "text"){
             //数字だけのテキストかどうかを判定
@@ -103,12 +112,7 @@ app.post('/callback', line.middleware(config), async (req, res) => {
                         break;
                     
                     case "データベース":
-                        const result = await db.query('SELECT * FROM stock_price_tb')   
-                        console.log(result);
-                        events_processed.push(client.replyMessage(event.replyToken, {
-                            type: "text",
-                            text: result
-                        }));
+                        databaseTest().then(() => {console.log("データベースs成功")})
                         break;
 
                      default :
