@@ -3,7 +3,14 @@
 const line = require('@line/bot-sdk');
 const express = require('express');
 const async = require('async');
-const database = require('./database')
+const { Client } = require('pg');
+
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: true,
+});
+
+client.connect();
 
 // create LINE SDK config from env variables
 const config = {
@@ -46,17 +53,14 @@ app.post('/callback', line.middleware(config), (req, res) => {
     }
 
     async function databaseTest() {
-        try {
-            const result = await db.query('SELECT * FROM stock_price_tb')   
-            console.log(result);
-            events_processed.push(client.replyMessage(event.replyToken, {
-                type: "text",
-                text: result
-            }));
-        } catch (e) {
-            console.log(e);
-        }
-        
+        client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
+            if (err) throw err;
+            for (let row of res.rows) {
+              console.log(JSON.stringify(row));
+            }
+            client.end();
+          });
+          
     }
 
     // イベントオブジェクトを順次処理。
