@@ -55,6 +55,25 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }));  
     }
 
+    async function databaseACCESS(e) {
+        //データベースに接続
+        await dbclient.connect();
+        let save = [];
+        //データベースの命令文（クエリ）をデータベースに送るための文
+        dbclient.query('SELECT * FROM  stock_price_tb', (err, res) => {
+            if (err) throw err;
+            for (let row of res.rows) {
+                console.log(row);
+                save.push(row)
+            }
+            await dbclient.end();
+        });
+        events_processed.push(client.replyMessage(event.replyToken, {
+            type: "text",
+            text: save
+        }));
+    }
+
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
@@ -113,21 +132,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        //データベースに接続
-                        dbclient.connect();
-                        let save = "";
-                        //データベースの命令文（クエリ）をデータベースに送るための文
-                        dbclient.query('SELECT * FROM  stock_price_tb', (err, res) => {
-                            if (err) throw err;
-                            for (let row of res.rows) {
-                                console.log(row);
-                            }
-                            dbclient.end();
-                        });
-                        events_processed.push(client.replyMessage(event.replyToken, {
-                            type: "text",
-                            text: save
-                        }));
+                        
                         break;    
                     
                      default :
