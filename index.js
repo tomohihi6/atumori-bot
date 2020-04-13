@@ -60,7 +60,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         await dbclient.connect();
         let save = [];
         //データベースの命令文（クエリ）をデータベースに送るための文
-        dbclient.query('SELECT * FROM  stock_price_tb', (err, res) => {
+        dbclient.query('SELECT * FROM  stock_price_tb', async (err, res) => {
             if (err) throw err;
             for (let row of res.rows) {
                 console.log(row);
