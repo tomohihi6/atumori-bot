@@ -108,11 +108,11 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        db.pool.connect(process.env.DATABASE_URL, (err, client) => {
+                        db.pool.connect((err, dbclient) => {
                             if (err) {
                               console.log(err);
                             } else {
-                              client.query('SELECT * FROM stock_price_tb', (err, result) => {
+                              dbclient.query('SELECT * FROM stock_price_tb', (err, result) => {
                                 console.log(result.rows);
                               });
                             }
