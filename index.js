@@ -21,9 +21,6 @@ const client = new line.Client(config);
 
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
-router.get('/', (req, res, next) => {
-    
-  });
 
 app.post('/callback', line.middleware(config), (req, res) => {
     res.sendStatus(200);
