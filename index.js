@@ -129,7 +129,7 @@ dbclient.query('SELECT * FROM  stock_price_tb', (err, res) => {
   for (let row of res.rows) {
     console.log(JSON.stringify(row));
   }
-  client.end();
+  dbclient.end();
 });
                         break;    
                     
