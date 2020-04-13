@@ -4,6 +4,9 @@ const line = require('@line/bot-sdk');
 const express = require('express');
 const async = require('async');
 const { Client } = require('pg');
+const database = require('./databse')
+
+let db = new database
 
 const dbclient = new Client({
   connectionString: process.env.DATABASE_URL,
@@ -108,14 +111,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        dbclient.connect();
-                            dbclient.query('SELECT * FROM stock_price_tb', function(err, result) {
-                              done();
-                              if(err) return console.error(err);
-                              console.log(result.rows);
-                            });
-                        
-                          break;    
+                        db.getBooks();
+                        db.getBooks;
+                        break;    
                     
                      default :
                         tempResponse(event).then(() => {console.log("イベント終了")})
