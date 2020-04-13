@@ -71,11 +71,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 console.log(row);
                 save.push(row)
             }
-            try {
-                await dbclient.end();
-            } catch(err) {
-                console.error(err);
-            }
+
+            await dbclient.end();
         });
         events_processed.push(client.replyMessage(e.replyToken, {
             type: "text",
