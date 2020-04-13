@@ -22,18 +22,7 @@ const client = new line.Client(config);
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
 router.get('/', (req, res, next) => {
-    db.pool.connect((err, client) => {
-      if (err) {
-        console.log(err);
-      } else {
-        client.query('SELECT * FROM stock_price_tb', (err, result) => {
-          console.log(result.rows);
-        });
-      }
-    });
-    res.render('index', {
-      title: 'hello express',
-    });
+    
   });
 
 app.post('/callback', line.middleware(config), (req, res) => {
@@ -119,8 +108,18 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        db.getBooks();
-                        db.getBooks;
+                        db.pool.connect((err, client) => {
+                            if (err) {
+                              console.log(err);
+                            } else {
+                              client.query('SELECT * FROM stock_price_tb', (err, result) => {
+                                console.log(result.rows);
+                              });
+                            }
+                          });
+                          res.render('index', {
+                            title: 'hello express',
+                          });
                         break;    
                     
                      default :
