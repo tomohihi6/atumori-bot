@@ -11,9 +11,8 @@ module.exports = class DB {
      getBooks = (request, response) => {
         pool.query('SELECT * FROM books', (error, results) => {
           if (error) {
-            console.error(error)
+            return console.error(error)
           }
-          console.log(results.rows)
           response.status(200).json(results.rows)
         })
       }
