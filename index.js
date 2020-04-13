@@ -46,12 +46,17 @@ app.post('/callback', line.middleware(config), (req, res) => {
     }
 
     async function databaseTest() {
-        const result = await db.query('SELECT * FROM stock_price_tb')   
-        console.log(result);
-        events_processed.push(client.replyMessage(event.replyToken, {
-            type: "text",
-            text: result
-        }));
+        try {
+            const result = await db.query('SELECT * FROM stock_price_tb')   
+            console.log(result);
+            events_processed.push(client.replyMessage(event.replyToken, {
+                type: "text",
+                text: result
+            }));
+        } catch (e) {
+            console.log(e);
+        }
+        
     }
 
     // イベントオブジェクトを順次処理。
