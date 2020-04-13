@@ -3,7 +3,12 @@
 const line = require('@line/bot-sdk');
 const express = require('express');
 const async = require('async');
-const pg = require('pg');
+const Pg = require('pg');
+
+const dbclient = new Pg({
+    connectionString: process.env.DATABASE_URL,
+    ssl: true,
+});
 
 // create LINE SDK config from env variables
 const config = {
@@ -103,8 +108,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        pg.connect(process.env.DATABASE_URL, function(err, dbclient, done) {
-                            dbclient.query('SELECT * FROM stock_price_tb', function(err, result) {
+                        dbclient.connect(process.env.DATABASE_URL, function(err, a, done) {
+                            a.query('SELECT * FROM stock_price_tb', function(err, result) {
                               done();
                               if(err) return console.error(err);
                               console.log(result.rows);
