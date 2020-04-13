@@ -3,6 +3,7 @@
 const line = require('@line/bot-sdk');
 const express = require('express');
 const async = require('async');
+const pg = require('pg');
 
 // create LINE SDK config from env variables
 const config = {
@@ -100,7 +101,17 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             text: "ノーコメントだなも"
                         }));
                         break;
-                        
+                    
+                    case "データベース":
+                        pg.connect(process.env.DATABASE_URL, function(err, dbclient, done) {
+                            dbclient.query('SELECT * FROM stock_price_tb', function(err, result) {
+                              done();
+                              if(err) return console.error(err);
+                              console.log(result.rows);
+                            });
+                          });
+                          break;    
+                    
                      default :
                         tempResponse(event).then(() => {console.log("イベント終了")})
                         break;
