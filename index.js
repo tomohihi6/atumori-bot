@@ -113,24 +113,17 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        // db.pool.connect((err, client) => {
-                        //     if (err) {
-                        //       console.log(err);
-                        //     } else {
-                        //         client.query('SELECT * FROM stock_price_tb', (err, result) => {
-                        //         console.log(result.rows);
-                        //       });
-                        //     }
-                        //   });
+                        //データベースに接続
                         dbclient.connect();
 
-dbclient.query('SELECT * FROM  stock_price_tb', (err, res) => {
-  if (err) throw err;
-  for (let row of res.rows) {
-    console.log(JSON.stringify(row));
-  }
-  dbclient.end();
-});
+                        //データベースの命令文（クエリ）をデータベースに送るための文
+                        dbclient.query('SELECT * FROM  stock_price_tb', (err, res) => {
+                            if (err) throw err;
+                            for (let row of res.rows) {
+                                console.log(row);
+                            }
+                            dbclient.end();
+                        });
                         break;    
                     
                      default :
