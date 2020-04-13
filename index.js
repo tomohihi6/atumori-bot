@@ -7,8 +7,8 @@ const database = require('./database')
 
 // create LINE SDK config from env variables
 const config = {
-  channelAccessToken: process.env.LINE_client_CHANNEL_TOKEN,
-  channelSecret: process.env.LINE_client_CHANNEL_SECRET,
+  channelAccessToken: process.env.LINE_BOT_CHANNEL_TOKEN,
+  channelSecret: process.env.LINE_BOT_CHANNEL_SECRET,
 };
 
 // create Express app
