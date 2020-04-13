@@ -3,14 +3,6 @@
 const line = require('@line/bot-sdk');
 const express = require('express');
 const async = require('async');
-const { Client } = require('pg');
-
-const dbClient = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: true,
-});
-
-dbClient.connect();
 
 // create LINE SDK config from env variables
 const config = {
@@ -24,18 +16,6 @@ const app = express();
 
 // APIコールのためのクライアントインスタンスを作成
 const client = new line.Client(config);
-
-async function databaseTest() {
-    dbClient.query('SELECT * FROM stock_price_tb;', (err, res) => {
-        if (err) throw err;
-        for (let row of res.rows) {
-          console.log(JSON.stringify(row));
-          console.log(res)
-        }
-        dbClient.end();
-      });
-
-}
 
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
@@ -120,11 +100,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             text: "ノーコメントだなも"
                         }));
                         break;
-                    
-                    case "データベース":
-                        databaseTest().then(() => {console.log("データベースs成功")})
-                        break;
-
+                        
                      default :
                         tempResponse(event).then(() => {console.log("イベント終了")})
                         break;
