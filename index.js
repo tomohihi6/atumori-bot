@@ -6,6 +6,14 @@ const router = express.Router();
 const async = require('async');
 const db = require('./database')
 
+const { Client } = require('pg');
+
+const dbclient = new Client({
+  connectionString: process.env.DATABASE_URL,
+});
+
+
+
 // create LINE SDK config from env variables
 const config = {
   channelAccessToken: process.env.LINE_BOT_CHANNEL_TOKEN,
@@ -105,15 +113,24 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        db.pool.connect((err, client) => {
-                            if (err) {
-                              console.log(err);
-                            } else {
-                                client.query('SELECT * FROM stock_price_tb', (err, result) => {
-                                console.log(result.rows);
-                              });
-                            }
-                          });
+                        // db.pool.connect((err, client) => {
+                        //     if (err) {
+                        //       console.log(err);
+                        //     } else {
+                        //         client.query('SELECT * FROM stock_price_tb', (err, result) => {
+                        //         console.log(result.rows);
+                        //       });
+                        //     }
+                        //   });
+                        dbclient.connect();
+
+dbclient.query('SELECT * FROM  store_price_tb', (err, res) => {
+  if (err) throw err;
+  for (let row of res.rows) {
+    console.log(JSON.stringify(row));
+  }
+  client.end();
+});
                         break;    
                     
                      default :
