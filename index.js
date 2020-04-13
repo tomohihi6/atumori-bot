@@ -10,7 +10,7 @@ const dbClient = new Client({
   ssl: true,
 });
 
-client.connect();
+dbClient.connect();
 
 // create LINE SDK config from env variables
 const config = {
