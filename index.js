@@ -4,15 +4,7 @@ const line = require('@line/bot-sdk');
 const express = require('express');
 const router = express.Router();
 const async = require('async');
-const { Client } = require('pg');
-const database = require('./database')
-
-let db = new database
-
-const dbclient = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: true,
-});
+const db = require('./database')
 
 // create LINE SDK config from env variables
 const config = {
