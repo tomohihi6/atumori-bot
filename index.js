@@ -117,9 +117,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
                               });
                             }
                           });
-                          res.render('index', {
-                            title: 'hello express',
-                          });
                         break;    
                     
                      default :
