@@ -24,7 +24,6 @@ const app = express();
 
 // APIコールのためのクライアントインスタンスを作成
 const client = new line.Client(config);
-const db = new database
 
 async function databaseTest() {
     dbClient.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
