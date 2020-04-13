@@ -1,19 +1,10 @@
-'use strict'
+const pg = require('pg');
+require('dotenv').config();
 
-const { Pool } = require('pg')
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: true,
-})
-
-module.exports = class DB {
-     getBooks = (request, response) => {
-        pool.query('SELECT * FROM books', (error, results) => {
-          if (error) {
-            return console.error(error)
-          }
-          response.status(200).json(results.rows)
-        })
-      }
-}
+exports.pool = pg.Pool ({
+  host: process.env.ENV_HOST,
+  databese: process.env.ENV_DB,
+  user: process.env.ENV_USER,
+  port: 5432,
+  password: process.env.ENV_PASSWORD,
+});
