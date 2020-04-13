@@ -55,20 +55,25 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }));  
     }
 
-    async function databaseACCESS() {
+    async function databaseACCESS(e) {
         //データベースに接続
-        await dbclient.connect();
+        try {
+            await dbclient.connect();
+        } catch(err) {
+            console.error(err);
+        }
+        
         let save = [];
         //データベースの命令文（クエリ）をデータベースに送るための文
         dbclient.query('SELECT * FROM  stock_price_tb', async (err, res) => {
-            if (err) throw err;
+            if (err) console.error(err);
             for (let row of res.rows) {
                 console.log(row);
                 save.push(row)
             }
             await dbclient.end();
         });
-        events_processed.push(client.replyMessage(event.replyToken, {
+        events_processed.push(client.replyMessage(e.replyToken, {
             type: "text",
             text: save
         }));
@@ -132,7 +137,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        databaseACCESS();
+                        databaseACCESS(event);
                         break;    
                     
                      default :
