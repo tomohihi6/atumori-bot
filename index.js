@@ -71,7 +71,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 console.log(row);
                 save.push(row)
             }
-            console.log(save)
+            console.log(JSON.parse(save.user_id))
 
             await dbclient.end();
         });
