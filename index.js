@@ -17,7 +17,7 @@ const app = express();
 
 // APIコールのためのクライアントインスタンスを作成
 const client = new line.Client(config);
-
+const db = new database
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
 app.post('/callback', line.middleware(config), async (req, res) => {
@@ -103,7 +103,7 @@ app.post('/callback', line.middleware(config), async (req, res) => {
                         break;
                     
                     case "データベース":
-                        const result = await database.query('SELECT * FROM stock_price_tb')   
+                        const result = await db.query('SELECT * FROM stock_price_tb')   
                         console.log(result);
                         events_processed.push(client.replyMessage(event.replyToken, {
                             type: "text",
