@@ -108,13 +108,13 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        dbclient.connect(process.env.DATABASE_URL, function(err, a, done) {
-                            a.query('SELECT * FROM stock_price_tb', function(err, result) {
+                        dbclient.connect();
+                            dbclient.query('SELECT * FROM stock_price_tb', function(err, result) {
                               done();
                               if(err) return console.error(err);
                               console.log(result.rows);
                             });
-                          });
+                        
                           break;    
                     
                      default :
