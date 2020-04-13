@@ -71,11 +71,15 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 console.log(row);
                 save.push(row)
             }
-            await dbclient.end();
+            try {
+                await dbclient.end();
+            } catch(err) {
+                console.error(err);
+            }
         });
         events_processed.push(client.replyMessage(e.replyToken, {
             type: "text",
-            text: save
+            text: "テスト"
         }));
     }
 
