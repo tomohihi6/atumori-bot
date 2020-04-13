@@ -30,6 +30,7 @@ async function databaseTest() {
         if (err) throw err;
         for (let row of res.rows) {
           console.log(JSON.stringify(row));
+          console.log(res)
         }
         dbClient.end();
       });
