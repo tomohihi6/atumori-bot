@@ -115,7 +115,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     case "データベース":
                         //データベースに接続
                         dbclient.connect();
-
+                        let save = "";
                         //データベースの命令文（クエリ）をデータベースに送るための文
                         dbclient.query('SELECT * FROM  stock_price_tb', (err, res) => {
                             if (err) throw err;
@@ -124,6 +124,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             }
                             dbclient.end();
                         });
+                        events_processed.push(client.replyMessage(event.replyToken, {
+                            type: "text",
+                            text: save
+                        }));
                         break;    
                     
                      default :
