@@ -26,7 +26,7 @@ const app = express();
 const client = new line.Client(config);
 
 async function databaseTest() {
-    dbClient.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
+    dbClient.query('SELECT * FROM stock_price_tb;', (err, res) => {
         if (err) throw err;
         for (let row of res.rows) {
           console.log(JSON.stringify(row));
