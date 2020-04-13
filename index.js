@@ -46,7 +46,7 @@ app.post('/callback', line.middleware(config), async (req, res) => {
     }
 
     // イベントオブジェクトを順次処理。
-    req.body.events.forEach((event) => {
+    req.body.events.forEach(async (event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
         if (event.type == "message" && event.message.type == "text"){
             //数字だけのテキストかどうかを判定
@@ -109,6 +109,8 @@ app.post('/callback', line.middleware(config), async (req, res) => {
                             type: "text",
                             text: result
                         }));
+                        break;
+
                      default :
                         tempResponse(event).then(() => {console.log("イベント終了")})
                         break;
