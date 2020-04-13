@@ -108,7 +108,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        db.pool.connect((err, client) => {
+                        db.pool.connect(process.env.DATABASE_URL, (err, client) => {
                             if (err) {
                               console.log(err);
                             } else {
