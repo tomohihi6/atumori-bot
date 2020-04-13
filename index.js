@@ -63,15 +63,15 @@ app.post('/callback', line.middleware(config), (req, res) => {
             console.error(err);
         }
         
-        let save = [];
+        let save;
         //データベースの命令文（クエリ）をデータベースに送るための文
         dbclient.query('SELECT * FROM  stock_price_tb', async (err, res) => {
             if (err) console.error(err);
             for (let row of res.rows) {
                 console.log(row);
-                save.push(row)
+                save= JSON.parse(row)
             }
-            console.log(JSON.parse(save.user_id))
+            console.log(save.user_id)
 
             await dbclient.end();
         });
