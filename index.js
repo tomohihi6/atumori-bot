@@ -124,7 +124,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         //   });
                         dbclient.connect();
 
-dbclient.query('SELECT * FROM  store_price_tb', (err, res) => {
+dbclient.query('SELECT * FROM  stock_price_tb', (err, res) => {
   if (err) throw err;
   for (let row of res.rows) {
     console.log(JSON.stringify(row));
