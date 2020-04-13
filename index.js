@@ -4,7 +4,7 @@ const line = require('@line/bot-sdk');
 const express = require('express');
 const async = require('async');
 const { Client } = require('pg');
-const database = require('./databse')
+const database = require('./database')
 
 let db = new database
 
