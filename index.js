@@ -1,6 +1,6 @@
 'use strict';
 
-const line = require('@line/client-sdk');
+const line = require('@line/bot-sdk');
 const express = require('express');
 const async = require('async');
 const database = require('./database')
@@ -103,7 +103,7 @@ app.post('/callback', line.middleware(config), async (req, res) => {
                         break;
                     
                     case "データベース":
-                        const result = await db.query('SELECT * FROM stock_price_tb')   
+                        const result = await database.query('SELECT * FROM stock_price_tb')   
                         console.log(result);
                         events_processed.push(client.replyMessage(event.replyToken, {
                             type: "text",
