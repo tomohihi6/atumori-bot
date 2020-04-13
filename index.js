@@ -55,7 +55,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }));  
     }
 
-    async function databaseACCESS(e) {
+    async function databaseACCESS() {
         //データベースに接続
         await dbclient.connect();
         let save = [];
@@ -132,7 +132,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        
+                        databaseACCESS();
                         break;    
                     
                      default :
