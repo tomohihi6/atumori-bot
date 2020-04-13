@@ -3,7 +3,7 @@
 const line = require('@line/bot-sdk');
 const express = require('express');
 const async = require('async');
-const Pg = require('pg');
+const {Pg} = require('pg');
 
 const dbclient = new Pg({
     connectionString: process.env.DATABASE_URL,
