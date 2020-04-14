@@ -135,7 +135,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         text: "はい"
                     },
                     {
-                        type: "message",
+                        type: "delete",
                         label: "いいえ",
                         text: "いいえ"
                     }
@@ -204,6 +204,11 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         
                 }
             }
+        } else {
+            events_processed.push(client.replyMessage(e.replyToken, {
+                type: "text",
+                text: "うんち"
+            }));
         }
         console.log(req.body);
         console.log(req.body.events[0].source)
