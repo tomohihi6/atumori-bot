@@ -73,8 +73,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
             }
 
             dbclient.end();
+            callback(save.user_id);
         });
-        callback(save.user_id);
     }
 
     function replyDatabase(param) {
