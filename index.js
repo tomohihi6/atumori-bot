@@ -68,8 +68,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
         let day = toDoubleDigits(date.getDate());
         let hour = date.getHours();
         let ampm = (hour < 12) ? "0" : "1";
-        if (ampm = "0") let x = "午前"
-        else let x = "午後"
+        let x = "";
+        if (ampm = "0") x = "午前"
+        else x = "午後"
         const displayTimeMessage = year + '/' + month + '/' + day + '/' + x;
         const yyyymmddampm = year + '/' + month + '/' + day + '/' + ampm;
         
