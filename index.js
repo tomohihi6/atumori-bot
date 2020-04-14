@@ -49,7 +49,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
             `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
         ]
         let random = Math.floor( Math.random() * tempTexts.length );
-        callback(tempTexts);
+        callback(e, tempTexts);
     }
 
     function databaseACCESS(e, callback) {
@@ -70,13 +70,13 @@ app.post('/callback', line.middleware(config), (req, res) => {
             }
 
             dbclient.end();
-            callback(save.user_id);
+            callback(e, save.user_id);
         });
     }
 
-    function replyDatabase(param) {
+    function replyDatabase(e, param) {
         console.log(`${param}は正常に取得されています`);
-        events_processed.push(client.replyMessage(event.replyToken, {
+        events_processed.push(client.replyMessage(e.replyToken, {
             type: "text",
             text: param
         }));
