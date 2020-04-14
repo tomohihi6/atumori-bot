@@ -130,7 +130,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 console.log(res);
                 dbclient.end();
                 console.log("update client was closed");
-                replyMessage(e, "新しい株価を記録しただなも")
+                replyMessage(e, "これが株価一覧だなも")
             }
         }
     }
