@@ -30,40 +30,11 @@ const client = new line.Client(config);
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
 
-let events_processed = [];
-
-async function databaseACCESS(e) {
-    //データベースに接続
-    try {
-        await dbclient.connect();
-    } catch(err) {
-        console.error(err);
-    }
-    
-    let save;
-    //データベースの命令文（クエリ）をデータベースに送るための文
-    dbclient.query('SELECT * FROM  stock_price_tb', async (err, res) => {
-        if (err) console.error(err);
-        for (let row of res.rows) {
-            console.log(row);
-            save = await row
-        }
-
-        console.log(save.user_id)
-
-        await dbclient.end();
-    });
-    events_processed.push(client.replyMessage(e.replyToken, {
-        type: "text",
-        text: save.user_id
-    }));
-}
-
 app.post('/callback', line.middleware(config), (req, res) => {
     res.sendStatus(200);
 
     // すべてのイベント処理のプロミスを格納する配列。
-
+    let events_processed = [];
 
     //パターンにないメッセージが来た時にランダムに返信メッセージを決める
     async function tempResponse(e) {
@@ -84,10 +55,41 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }));  
     }
 
+    async function databaseACCESS(e, callback) {
+        //データベースに接続
+        try {
+            await dbclient.connect();
+        } catch(err) {
+            console.error(err);
+        }
+        
+        let save;
+        //データベースの命令文（クエリ）をデータベースに送るための文
+        dbclient.query('SELECT * FROM  stock_price_tb', callback, (err, res)=> {
+            if (err) console.error(err);
+            for (let row of res.rows) {
+                console.log(row);
+                save = await row
+            }
+
+            console.log(save.user_id)
+
+            await dbclient.end();
+        });
+        callback(save.user.id);
+    }
+
+    function replyDatabase(param) {
+        events_processed.push(client.replyMessage(event.replyToken, {
+            type: "text",
+            text: param
+        }));
+    }
+
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
-        if (event.type == "message" && event.message.type == "text") {
+        if (event.type == "message" && event.message.type == "text"){
             //数字だけのテキストかどうかを判定
             let numFlug = true;
             for(let i = 0; i < event.message.text.length; i++) {
@@ -142,7 +144,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        databaseACCESS(event).then(() => {console.log("データベース終了")})
+                        databaseACCESS(event, replyDatabase).then(() => {console.log("データベース終了")})
                         break;    
                     
                      default :
@@ -152,20 +154,16 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             }
         }
-    }).then(() => {
         console.log(req.body);
         console.log(req.body.events[0].source)
+    });
 
-        // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
-        Promise.all(events_processed).then(
-            (response) => {
-                console.log(`${response.length} event(s) processed.`);
-            }
-        );
-    })
-
-
-    
+    // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
+    Promise.all(events_processed).then(
+        (response) => {
+            console.log(`${response.length} event(s) processed.`);
+        }
+    );
 });
 
 // event handler
