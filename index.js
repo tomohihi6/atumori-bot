@@ -148,14 +148,14 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }
         console.log(req.body);
         console.log(req.body.events[0].source)
-    });
 
-    // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
-    Promise.all(events_processed).then(
-        (response) => {
-            console.log(`${response.length} event(s) processed.`);
-        }
-    );
+        // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
+         Promise.all(events_processed).then(
+            (response) => {
+                console.log(`${response.length} event(s) processed.`);
+            }
+        );
+    });
 });
 
 // event handler
