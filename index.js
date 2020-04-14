@@ -162,7 +162,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             }
             if(numFlug) {
-                insertStockPrice(event, event.source.userId, event.message.text,replyMessage);
+                insertStockPrice(event, event.source.userId, event.message.text,replyConfirmTemplate);
 
                 //数字以外のテキストの処理    
             } else {
