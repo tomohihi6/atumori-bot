@@ -55,10 +55,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }));  
     }
 
-    async function databaseACCESS(e, callback) {
+    function databaseACCESS(e, callback) {
         //データベースに接続
         try {
-            await dbclient.connect();
+            dbclient.connect();
         } catch(err) {
             console.error(err);
         }
