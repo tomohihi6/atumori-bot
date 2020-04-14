@@ -121,7 +121,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
     function fetchStockPrices(e) {
         dbclient.connect().then((res) => {
-            dbclient.query(`SELECT time, stock_price FROM stock_price_tb WHERE user_id='${e.source.userId}';`, (err, res) => {
+            dbclient.query(`SELECT time, stock_price FROM stock_price_tb WHERE user_id='${e.source.userId}' ORDER BY time ASC;`, (err, res) => {
                 if(err) {
                     console.log(err);
                     replyMessage(e, "株価一覧取得に失敗しただなも");
