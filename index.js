@@ -204,12 +204,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         
                 }
             }
-        } else if(event.type == "delete") {
-            events_processed.push(client.replyMessage(e.replyToken, {
-                type: "text",
-                text: "うんち"
-            }));
-        }
+        } 
         console.log(req.body);
         console.log(req.body.events[0].source)
     });
