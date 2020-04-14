@@ -8,12 +8,6 @@ const db = require('./database')
 
 const { Client } = require('pg');
 
-const dbclient = new Client({
-  connectionString: process.env.DATABASE_URL,
-});
-
-
-
 // create LINE SDK config from env variables
 const config = {
   channelAccessToken: process.env.LINE_BOT_CHANNEL_TOKEN,
@@ -31,6 +25,9 @@ const client = new line.Client(config);
 // about the middleware, please refer to doc
 
 app.post('/callback', line.middleware(config), (req, res) => {
+    const dbclient = new Client({
+        connectionString: process.env.DATABASE_URL,
+      });
     res.sendStatus(200);
 
     // すべてのイベント処理のプロミスを格納する配列。
