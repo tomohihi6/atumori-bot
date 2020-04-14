@@ -177,10 +177,11 @@ function handleEvent(event) {
   return client.replyMessage(event.replyToken, echo);
 }
 
-async function getUserName(userID) {
+function getUserName(userID) {
     const userId = userID;
-    const pro = await client.getProfile(userId)
-    return pro.displayName;
+    const pro = client.getProfile(userId).then(()=> {
+        return pro.displayName;
+    })  
 }
 
 // listen on port
