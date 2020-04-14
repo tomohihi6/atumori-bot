@@ -78,7 +78,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
         dbclient.connect();
         dbclient.query(`INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '${yyyymmddampm}');`, 
         callback, (err, res) => {
-            if (err) console.log(err);
+            if (err) {
+                console.log(err);
+                callback(e, `今日の${x}の分の株価はすでに記録してあるだなも`)
+            }
             else {
                 console.log(res)
                 dbclient.end();
