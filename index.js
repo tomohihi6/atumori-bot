@@ -55,6 +55,24 @@ app.post('/callback', line.middleware(config), (req, res) => {
         })
     }
 
+    function insertStockPrice(e, userId, stockPrice, callback) {
+        let date = new Date();
+        let month = date.getMonth() + 1 ;
+        let day = date.getDate() ;
+        let hour = date.getHours();
+        let ampm = (hour < 12) ? 00 : 11;
+        const time = parseInt('' + month + day + ampm);
+        console.log(time);
+        dbclient.connect();
+        dbclient.query(`INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES (${userId}, ${stockPrice}, ${time})`, 
+        callback, (err, res) => {
+            if (err) console.log(err);
+            console.log(res)
+            dbclient.end();
+            callback(e, "テスト");
+        });
+    }
+
     function databaseACCESS(e, callback) {
         //データベースに接続
         try {
@@ -77,7 +95,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         });
     }
 
-    function replyDatabase(e, param) {
+    function replyMessage(e, param) {
         console.log(`${param}は正常に取得されています`);
         events_processed.push(client.replyMessage(e.replyToken, {
             type: "text",
@@ -101,14 +119,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             }
             if(numFlug) {
-                let date = new Date();
-                let hour = date.getHours();
-                let ampm = (hour < 12) ? "午前" : "午後";
-
-                events_processed.push(client.replyMessage(event.replyToken, {
-                    type: "text",
-                    text: "株価を記録しただなも"
-                }))
+                insertStockPrice(event, e.source.userId, e.message.text, replyMessage);
 
                 //数字以外のテキストの処理    
             } else {
@@ -143,11 +154,11 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        databaseACCESS(event, replyDatabase)
+                        databaseACCESS(event, replyMessage)
                         break;    
                     
                      default :
-                        tempResponse(event, replyDatabase)
+                        tempResponse(event, replyMessage)
                         break;
                         
                 }
@@ -186,6 +197,10 @@ function getUserName(userID) {
             resolve(profile.displayName)
         })
     })
+}
+
+function getCurrentTime() {
+    const date = new Date();
 }
 
 // listen on port
