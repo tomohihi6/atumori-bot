@@ -52,7 +52,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         })
     }
 
-    function insertStockPrice(e, userId, stockPrice, callback) {
+    function insertStockPrice(e, userId, stockPrice, callback1, callback2) {
         //数字の0詰めを実装する関数
         var toDoubleDigits = function(num) {
             num += "";
@@ -80,13 +80,13 @@ app.post('/callback', line.middleware(config), (req, res) => {
         callback, (err, res) => {
             if (err) {
                 console.log(err);
-                callback(e, `今日の${x}の分の株価はすでに記録してあるだなも`)
+                callback1(e, `今日の${x}の分の株価はすでに記録してあるだなも`)
             }
             else {
                 console.log(res)
                 dbclient.end();
                 console.log("insert client was closed")
-                callback(e, `${displayTimeMessage}として株価${stockPrice}を記録しただなも`);
+                callback2(e, `${displayTimeMessage}として株価${stockPrice}を記録しただなも`);
             }
             
         });
@@ -121,6 +121,28 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }));
     }
 
+    function replyConfirmTemplate(e, pram) {
+        events_processed.push(client.replyMessage(e.replyToken, {
+            type: "template",
+            altText: param,
+            template: {
+                type: "confirm",
+                actions: [
+                    {
+                        type: "message",
+                        label: "はい",
+                        text: "はい"
+                    },
+                    {
+                        type: "message",
+                        label: "いいえ",
+                        text: "いいえ"
+                    }
+                ],
+            }
+        }))
+    }
+
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
@@ -137,7 +159,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             }
             if(numFlug) {
-                insertStockPrice(event, event.source.userId, event.message.text, replyMessage);
+                insertStockPrice(event, event.source.userId, event.message.text, replyConfirmTemplate, replyMessage);
 
                 //数字以外のテキストの処理    
             } else {
