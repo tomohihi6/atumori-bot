@@ -79,7 +79,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 console.log(err);
                 console.log("エラー起こってるで")
                 dbclient.end();
-                replyConfirmTemplate(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, "updateStockPrice", "no");
+                replyConfirmTemplate(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, JSON.stringify({name: "updateStockPrice", stockP: stockPrice}), "no");
             }
             else {
                 console.log("データはインサートしてるみたい")
@@ -90,6 +90,29 @@ app.post('/callback', line.middleware(config), (req, res) => {
             }
             
         });
+    }
+
+    function updateStockPrice(e) {
+        if(JSON.parse(e.postback.data).name == "updateStockPrice") {
+            const stockPrice = JSON.parse(e.postback.data).stockPrice;
+            dbclient.connect();
+            dbclient.query(`UPDATE stock_price_tb SET stock_price='${stockPrice}';`, 
+            (err, res) => {
+                if(err) {
+                    console.log(err);
+                    replyMessage(e, "データの記録に失敗しただなも");
+                } else {
+                    console.log("データアップデート完了");
+                    console.log(res);
+                    dbclient.end();
+                    console.log("update client was closed");
+                    replyMessage(e, "新しい株価を記録しただなも")
+                }
+            })
+        } else if (e.postback.data == "no") {
+            replyMessage(e, "わかっただなも");
+        } 
+        
     }
 
 
@@ -157,7 +180,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 let charCode = event.message.text.charCodeAt(i);
                 if(charCode < 48  || charCode > 57){
                     numFlug = false;
-                    //１つでも数字以外の文字がa見つかった場合for文終わり
+                    //１つでも数字以外の文字が見つかった場合for文終わり
                     break;
                 }
             }
@@ -207,7 +230,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             }
         } else if(event.type == "postback") {
-            console.log("うんち")
+            updateStockPrice(event);
         }
         console.log(req.body);
         console.log(req.body.events[0].source)
