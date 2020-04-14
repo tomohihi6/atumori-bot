@@ -93,6 +93,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
     }
 
     function updateStockPrice(e) {
+        console.log(e.postback.data);
         if(e.postback.data.name == "updateStockPrice") {
             const stockPrice = e.postback.data.stockPrice;
             console.log(`株価は${stockPrice}`);
