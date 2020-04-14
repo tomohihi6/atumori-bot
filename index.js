@@ -56,6 +56,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
     }
 
     function insertStockPrice(e, userId, stockPrice, callback) {
+        const sP = parseInt(stockPrice);
         let date = new Date();
         let month = date.getMonth() + 1 ;
         let day = date.getDate() ;
@@ -119,7 +120,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             }
             if(numFlug) {
-                insertStockPrice(event, e.source.userId, e.message.text, replyMessage);
+                insertStockPrice(event, event.source.userId, event.message.text, replyMessage);
 
                 //数字以外のテキストの処理    
             } else {
