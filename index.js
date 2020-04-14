@@ -92,9 +92,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
         });
     }
 
-    function updateStockPrice(e. callback) {
-
-    }
 
     function databaseACCESS(e, callback) {
         //データベースに接続
@@ -165,7 +162,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             }
             if(numFlug) {
-                insertStockPrice(event, event.source.userId, event.message.text,replyConfirmTemplate);
+                insertStockPrice(event, event.source.userId, event.message.text,);
 
                 //数字以外のテキストの処理    
             } else {
