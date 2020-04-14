@@ -241,7 +241,11 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     
                     case "データベース":
                         databaseACCESS(event, replyMessage)
-                        break;    
+                        break;   
+                        
+                    case "株価一覧":
+                        fetchStockPrices(event);
+                        break;
                     
                      default :
                         tempResponse(event, replyMessage)
