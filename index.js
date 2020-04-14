@@ -40,7 +40,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
     function tempResponse(e, callback) {
         //おそらくプロフィール情報の取得に時間がかかってnameにundefindが入ることがあるので待つ
         let name = getUserName(e.source.userId);
-        // console.log(`名前は${name}`)
+        console.log(`名前は${name}`)
         const tempTexts = [
             "会話実装めんどくさすぎてはげそうだなも!",
             "ぼくと話す前に早く借金返せだなも！",
