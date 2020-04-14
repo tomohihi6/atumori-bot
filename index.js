@@ -52,7 +52,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         })
     }
 
-    function insertStockPrice(e, userId, stockPrice, callback1, callback2) {
+    function insertStockPrice(e, userId, stockPrice, callback1) {
         //数字の0詰めを実装する関数
         var toDoubleDigits = function(num) {
             num += "";
@@ -75,7 +75,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         console.log(yyyymmddampm);
         dbclient.connect();
         dbclient.query(`INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '${yyyymmddampm}');`, 
-        callback1, callback2, (err, res) => {
+        callback1, (err, res) => {
             if (err) {
                 console.log(err);
                 console.log("エラー起こってるで")
@@ -87,7 +87,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 console.log(res)
                 dbclient.end();
                 console.log("insert client was closed")
-                callback2(e, `${displayTimeMessage}として株価${stockPrice}を記録しただなも`);
+                callback1(e, `${displayTimeMessage}として株価${stockPrice}を記録しただなも`);
             }
             
         });
@@ -162,7 +162,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             }
             if(numFlug) {
-                insertStockPrice(event, event.source.userId, event.message.text,replyConfirmTemplate, replyMessage);
+                insertStockPrice(event, event.source.userId, event.message.text,replyMessage);
 
                 //数字以外のテキストの処理    
             } else {
