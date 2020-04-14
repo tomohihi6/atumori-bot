@@ -80,7 +80,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 console.log(err);
                 console.log("エラー起こってるで")
                 dbclient.end();
-                callback1(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, "updateStockPrice", "no");
+                callback1(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`);
             }
             else {
                 console.log("データはインサートしてるみたい")
@@ -122,7 +122,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }));
     }
 
-    function replyConfirmTemplate(e, param, yesData, noData) {
+    function replyConfirmTemplate(e, param) {
         console.log(`${param}は正常に取得されています()`)
         events_processed.push(client.replyMessage(e.replyToken, {
             type: "template",
@@ -134,12 +134,12 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     {
                         type: "postback",
                         label: "はい",
-                        data: yesData
+                        data: "yes"
                     },
                     {
                         type: "postback",
                         label: "いいえ",
-                        data: noData,
+                        data: "no",
                     }
                 ],
             }
