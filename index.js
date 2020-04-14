@@ -74,20 +74,20 @@ app.post('/callback', line.middleware(config), (req, res) => {
         
         console.log(yyyymmddampm);
         dbclient.connect();
-        dbclient.query(`INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '${yyyymmddampm}');`, 
+        dbclient.query(`INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '1');`, 
         callback1, (err, res) => {
             if (err) {
                 console.log(err);
                 console.log("エラー起こってるで")
                 dbclient.end();
-                replyConfirmTemplate(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`);
+                replyConfirmTemplate(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, "updateStockPrice", "no");
             }
             else {
                 console.log("データはインサートしてるみたい")
                 console.log(res)
                 dbclient.end();
                 console.log("insert client was closed")
-                callback1(e, `${displayTimeMessage}として株価${stockPrice}を記録しただなも`);
+                replyMessage(e, `${displayTimeMessage}として株価${stockPrice}を記録しただなも`);
             }
             
         });
