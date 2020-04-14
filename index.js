@@ -137,7 +137,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     {
                         type: "unti",
                         label: "いいえ",
-                        text: "いいえ"
+                        data: JSON.stringify({"action":"no"})
                     }
                 ],
             }
