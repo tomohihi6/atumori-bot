@@ -70,6 +70,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
             if (err) console.log(err);
             console.log(res)
             dbclient.end(() => {
+                console.log("insert client was closed")
                 callback(e, "テスト");
             })
         });
@@ -93,6 +94,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
             }
 
             dbclient.end().then(() => {
+                console.log("select client was closed")
                 callback(e, save.user_id);
             })
             
