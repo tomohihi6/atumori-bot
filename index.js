@@ -182,11 +182,9 @@ function handleEvent(event) {
 function getUserName(userID) {
     return new Promise(function(resolve, reject) {
         const userId = userID;
-        const pro = client.getProfile(userId, function(a) {
-            console.log(a);
-            resolve(pro.displayName);
-        });
-        
+        client.getProfile(userId).then((profile) => {
+            resolve(profile.displayName)
+        })
     })
 }
 
