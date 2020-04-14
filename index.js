@@ -49,7 +49,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
             `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
         ]
         let random = Math.floor( Math.random() * tempTexts.length );
-        callback(e, tempTexts);
+        callback(e, tempTexts[random]);
     }
 
     function databaseACCESS(e, callback) {
