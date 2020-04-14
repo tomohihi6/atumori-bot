@@ -79,10 +79,13 @@ app.post('/callback', line.middleware(config), (req, res) => {
         dbclient.query(`INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '${yyyymmddampm}');`, 
         callback, (err, res) => {
             if (err) console.log(err);
-            console.log(res)
-            dbclient.end();
-            console.log("insert client was closed")
-            callback(e, `${displayTimeMessage}として株価${stockPrice}を記録しただなも`);
+            else {
+                console.log(res)
+                dbclient.end();
+                console.log("insert client was closed")
+                callback(e, `${displayTimeMessage}として株価${stockPrice}を記録しただなも`);
+            }
+            
         });
     }
 
