@@ -30,11 +30,40 @@ const client = new line.Client(config);
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
 
+let events_processed = [];
+
+async function databaseACCESS(e) {
+    //データベースに接続
+    try {
+        await dbclient.connect();
+    } catch(err) {
+        console.error(err);
+    }
+    
+    let save;
+    //データベースの命令文（クエリ）をデータベースに送るための文
+    dbclient.query('SELECT * FROM  stock_price_tb', async (err, res) => {
+        if (err) console.error(err);
+        for (let row of res.rows) {
+            console.log(row);
+            save = await row
+        }
+
+        console.log(save.user_id)
+
+        await dbclient.end();
+    });
+    events_processed.push(client.replyMessage(e.replyToken, {
+        type: "text",
+        text: save.user_id
+    }));
+}
+
 app.post('/callback', line.middleware(config), (req, res) => {
     res.sendStatus(200);
 
     // すべてのイベント処理のプロミスを格納する配列。
-    let events_processed = [];
+
 
     //パターンにないメッセージが来た時にランダムに返信メッセージを決める
     async function tempResponse(e) {
@@ -55,35 +84,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }));  
     }
 
-    async function databaseACCESS(e) {
-        //データベースに接続
-        try {
-            await dbclient.connect();
-        } catch(err) {
-            console.error(err);
-        }
-        
-        let save;
-        //データベースの命令文（クエリ）をデータベースに送るための文
-        dbclient.query('SELECT * FROM  stock_price_tb', async (err, res) => {
-            if (err) console.error(err);
-            for (let row of res.rows) {
-                console.log(row);
-                save = await row
-            }
-
-            console.log(save.user_id)
-
-            await dbclient.end();
-        });
-        events_processed.push(client.replyMessage(e.replyToken, {
-            type: "text",
-            text: save.user_id
-        }));
-    }
-
     // イベントオブジェクトを順次処理。
-    req.body.events.forEach(async (event) => {
+    req.body.events.forEach((event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
         if (event.type == "message" && event.message.type == "text") {
             //数字だけのテキストかどうかを判定
