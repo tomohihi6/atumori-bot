@@ -66,10 +66,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
         callback, (err, res) => {
             if (err) console.log(err);
             console.log(res)
-            dbclient.end(() => {
-                console.log("insert client was closed")
-                callback(e, "テスト");
-            })
+            dbclient.end();
+            console.log("insert client was closed")
+            callback(e, "テスト");
         });
     }
 
