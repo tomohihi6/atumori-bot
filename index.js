@@ -92,8 +92,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 save = row
             }
 
-            dbclient.end();
-            callback(e, save.user_id);
+            dbclient.end().then(() => {
+                callback(e, save.user_id);
+            })
+            
         });
     }
 
