@@ -50,6 +50,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
             ]
             let random = Math.floor( Math.random() * tempTexts.length );
             callback(e, tempTexts[random]);
+        }).catch(() => {
+            console.log("失敗しました")
         })
     }
 
@@ -180,8 +182,11 @@ function handleEvent(event) {
 function getUserName(userID) {
     return new Promise(function(resolve, reject) {
         const userId = userID;
-        const pro = client.getProfile(userId);
-        resolve(pro.displayName);
+        const pro = client.getProfile(userId, function(a) {
+            console.log(a);
+            resolve(pro.displayName);
+        });
+        
     })
 }
 
