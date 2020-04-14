@@ -135,7 +135,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         text: "はい"
                     },
                     {
-                        type: "delete",
+                        type: "message",
                         label: "いいえ",
                         text: "いいえ"
                     }
@@ -204,7 +204,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         
                 }
             }
-        } 
+        }
         console.log(req.body);
         console.log(req.body.events[0].source)
     });
