@@ -145,7 +145,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }));
     }
 
-    function replyConfirmTemplate(e, param) {
+    function replyConfirmTemplate(e, param, yesData, noData) {
         console.log(`${param}は正常に取得されています()`)
         events_processed.push(client.replyMessage(e.replyToken, {
             type: "template",
@@ -157,12 +157,12 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     {
                         type: "postback",
                         label: "はい",
-                        data: "yes"
+                        data: yesData
                     },
                     {
                         type: "postback",
                         label: "いいえ",
-                        data: "no",
+                        data: noData,
                     }
                 ],
             }
