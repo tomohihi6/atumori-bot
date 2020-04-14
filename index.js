@@ -65,7 +65,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         const time = parseInt('' + month + day + ampm);
         console.log(time);
         dbclient.connect();
-        dbclient.query(`INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES (${userId}, ${stockPrice}, ${time})`, 
+        dbclient.query(`INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '${time}');`, 
         callback, (err, res) => {
             if (err) console.log(err);
             console.log(res)
