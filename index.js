@@ -121,11 +121,13 @@ app.post('/callback', line.middleware(config), (req, res) => {
     }
 
     function replyConfirmTemplate(e, param) {
+        console.log(`${param}は正常に取得されています()`)
         events_processed.push(client.replyMessage(e.replyToken, {
             type: "template",
-            altText: param,
+            altText: "うんち",
             template: {
                 type: "confirm",
+                text: param,
                 actions: [
                     {
                         type: "message",
@@ -197,7 +199,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;    
                     
                      default :
-                        tempResponse(event, replyMessage)
+                        tempResponse(event, replyConfirmTemplate)
                         break;
                         
                 }
