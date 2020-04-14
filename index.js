@@ -117,7 +117,22 @@ app.post('/callback', line.middleware(config), (req, res) => {
         } else if (JSON.parse(e.postback.data).name == "updateNo") {
             replyMessage(e, "わかっただなも");
         } 
-        
+    }
+
+    function fetchStockPrices(e) {
+        dbclient.connect();
+        dbclient.query(`SELECT time, stock_price FROM stock_price_tb WHERE user_id='${e.source.userId}';`), (err, res) => {
+            if(err) {
+                console.log(err);
+                replyMessage(e, "株価一覧取得に失敗しただなも");
+            } else {
+                console.log("データ取得完了");
+                console.log(res);
+                dbclient.end();
+                console.log("update client was closed");
+                replyMessage(e, "新しい株価を記録しただなも")
+            }
+        }
     }
 
 
