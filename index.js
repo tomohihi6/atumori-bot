@@ -69,7 +69,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
             if (err) console.error(err);
             for (let row of res.rows) {
                 console.log(row);
-                save = row
+                save = await row
             }
 
             console.log(save.user_id)
