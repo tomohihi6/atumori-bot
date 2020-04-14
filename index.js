@@ -130,6 +130,16 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     console.log(res);
                     dbclient.end();
                     console.log("update client was closed");
+                    const replyText = "";
+                    res.map((row) => {
+                        let time = row.time;
+                        let data = time.split("/")
+                        if (data[3] == "0") {
+                            replyText += `${data[0]}年${data[1]}月${data[2]}日午前の株価:${row.stock_price}\n`
+                        } else {
+                            replyText += `${data[0]}年${data[1]}月${data[2]}日午後の株価:${row.stock_price}\n`
+                        }
+                    })
                     replyMessage(e, "これが株価一覧だなも")
                 }
             }); 
