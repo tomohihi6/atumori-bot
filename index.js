@@ -130,7 +130,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     console.log(res);
                     dbclient.end();
                     console.log("update client was closed");
-                    const replyText = "";
+                    let replyText = "";
                     res.rows.forEach((row) => {
                         let time = row.time;
                         let data = time.split("/")
@@ -140,7 +140,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             replyText += `${data[0]}年${data[1]}月${data[2]}日午後の株価:${row.stock_price}\n`
                         }
                     })
-                    replyMessage(e, "これが株価一覧だなも")
+                    replyMessage(e, replyText)
                 }
             }); 
         });
