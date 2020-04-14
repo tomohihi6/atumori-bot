@@ -80,7 +80,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 console.log(err);
                 console.log("エラー起こってるで")
                 dbclient.end();
-                callback1(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`);
+                replyConfirmTemplate(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`);
             }
             else {
                 console.log("データはインサートしてるみたい")
