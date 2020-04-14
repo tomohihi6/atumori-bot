@@ -99,7 +99,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
             const time = JSON.parse(e.postback.data).time;
             console.log(`株価は${stockPrice}`);
             dbclient.connect();
-            dbclient.query(`UPDATE stock_price_tb SET stock_price='${stockPrice}' WHERE user_id='${e.source.userId} AND time='${time}';`, 
+            dbclient.query(`UPDATE stock_price_tb SET stock_price='${stockPrice}' WHERE user_id='${e.source.userId}' AND time='${time}';`, 
             (err, res) => {
                 if(err) {
                     console.log(err);
