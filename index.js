@@ -157,7 +157,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 let charCode = event.message.text.charCodeAt(i);
                 if(charCode < 48  || charCode > 57){
                     numFlug = false;
-                    //１つでも数字以外の文字が見つかった場合for文終わり
+                    //１つでも数字以外の文字がa見つかった場合for文終わり
                     break;
                 }
             }
