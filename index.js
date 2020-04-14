@@ -60,7 +60,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         let month = date.getMonth() + 1 ;
         let day = date.getDate() ;
         let hour = date.getHours();
-        let ampm = (hour < 12) ? 00 : 11;
+        let ampm = (hour < 12) ? "00" : "11";
         const time = parseInt('' + month + day + ampm);
         console.log(time);
         dbclient.connect();
