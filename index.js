@@ -89,7 +89,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     save = row
                 }
 
-                dbclient.release();
+                dbclient.end();
                 console.log(`${res} select client was closed`)
                 callback(e, save.user_id);
             });
