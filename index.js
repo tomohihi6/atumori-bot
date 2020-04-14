@@ -83,9 +83,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
     }
 
     // イベントオブジェクトを順次処理。
-    req.body.events.forEach((event) => {
+    req.body.events.forEach(async (event) => {
         // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
-        if (event.type == "message" && event.message.type == "text"){
+        if (event.type == "message" && event.message.type == "text") {
             //数字だけのテキストかどうかを判定
             let numFlug = true;
             for(let i = 0; i < event.message.text.length; i++) {
@@ -140,7 +140,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        databaseACCESS(event);
+                        databaseACCESS(event).then(() => {console.log("データベース終了")})
                         break;    
                     
                      default :
@@ -150,16 +150,20 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             }
         }
+    }).then(() => {
         console.log(req.body);
         console.log(req.body.events[0].source)
-    });
 
-    // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
-    Promise.all(events_processed).then(
-        (response) => {
-            console.log(`${response.length} event(s) processed.`);
-        }
-    );
+        // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
+        Promise.all(events_processed).then(
+            (response) => {
+                console.log(`${response.length} event(s) processed.`);
+            }
+        );
+    })
+
+
+    
 });
 
 // event handler
