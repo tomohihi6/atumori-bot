@@ -95,7 +95,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
     function updateStockPrice(e) {
         console.log(e.postback.data);
         if(e.postback.data.name == "updateStockPrice") {
-            const stockPrice = e.postback.data.stockPrice;
+            const stockPrice = e.postback.data.stockP;
             console.log(`株価は${stockPrice}`);
             dbclient.connect();
             dbclient.query(`UPDATE stock_price_tb SET stock_price='${stockPrice}';`, 
