@@ -87,7 +87,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 console.log(res)
                 dbclient.end();
                 console.log("insert client was closed")
-                callback2(e, `${displayTimeMessage}として株価${stockPrice}を記録しただなも`);
+                callback1(e, `${displayTimeMessage}として株価${stockPrice}を記録しただなも`);
             }
             
         });
