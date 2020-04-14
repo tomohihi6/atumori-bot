@@ -135,7 +135,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         text: "はい"
                     },
                     {
-                        type: "message",
+                        type: "m",
                         label: "いいえ",
                         text: "いいえ"
                     }
