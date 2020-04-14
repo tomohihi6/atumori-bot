@@ -135,7 +135,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         text: "はい"
                     },
                     {
-                        type: "m",
+                        type: "postback",
                         label: "いいえ",
                         text: "いいえ"
                     }
@@ -204,7 +204,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         
                 }
             }
-        } else if(event.type =="unti") {
+        } else if(event.type == "postback") {
             console.log("うんち")
         }
         console.log(req.body);
