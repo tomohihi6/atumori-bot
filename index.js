@@ -78,10 +78,12 @@ app.post('/callback', line.middleware(config), (req, res) => {
         callback1, callback2, (err, res) => {
             if (err) {
                 console.log(err);
+                console.log("エラー起こってるで")
                 dbclient.end();
                 callback1(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, "updateStockPrice", "no");
             }
             else {
+                console.log("データはインサートしてるみたい")
                 console.log(res)
                 dbclient.end();
                 console.log("insert client was closed")
