@@ -136,11 +136,11 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
                     
                     case "データベース":
-                        databaseACCESS(event, replyDatabase).then(() => {console.log("データベース終了")})
+                        databaseACCESS(event, replyDatabase)
                         break;    
                     
                      default :
-                        tempResponse(event, replyDatabase).then(() => {console.log("イベント終了")})
+                        tempResponse(event, replyDatabase)
                         break;
                         
                 }
