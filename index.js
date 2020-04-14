@@ -78,7 +78,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         });
         events_processed.push(client.replyMessage(e.replyToken, {
             type: "text",
-            text: "テスト"
+            text: save.user_id
         }));
     }
 
