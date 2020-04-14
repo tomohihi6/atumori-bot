@@ -72,18 +72,13 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 save = row
             }
 
-            console.log(save.user_id)
-
             dbclient.end();
         });
         callback(save.user_id);
     }
 
     function replyDatabase(param) {
-        events_processed.push(client.replyMessage(event.replyToken, {
-            type: "text",
-            text: param
-        }));
+        console.log(`${param}は正常に取得されています`);
     }
 
     // イベントオブジェクトを順次処理。
