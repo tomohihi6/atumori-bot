@@ -131,7 +131,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     dbclient.end();
                     console.log("update client was closed");
                     const replyText = "";
-                    res.forEach((row) => {
+                    res.rows.forEach((row) => {
                         let time = row.time;
                         let data = time.split("/")
                         if (data[3] == "0") {
