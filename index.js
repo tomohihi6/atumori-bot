@@ -80,6 +80,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         callback1, callback2, (err, res) => {
             if (err) {
                 console.log(err);
+                dbclient.end();
                 callback1(e, `今日の${x}の分の株価はすでに記録してあるだなも`)
             }
             else {
@@ -121,7 +122,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }));
     }
 
-    function replyConfirmTemplate(e, pram) {
+    function replyConfirmTemplate(e, param) {
         events_processed.push(client.replyMessage(e.replyToken, {
             type: "template",
             altText: param,
@@ -206,14 +207,13 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }
         console.log(req.body);
         console.log(req.body.events[0].source)
-
-        // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
-         Promise.all(events_processed).then(
-            (response) => {
-                console.log(`${response.length} event(s) processed.`);
-            }
-        );
     });
+            // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
+            Promise.all(events_processed).then(
+                (response) => {
+                    console.log(`${response.length} event(s) processed.`);
+                }
+            );
 });
 
 // event handler
