@@ -39,8 +39,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
     //パターンにないメッセージが来た時にランダムに返信メッセージを決める
     function tempResponse(e, callback) {
         //おそらくプロフィール情報の取得に時間がかかってnameにundefindが入ることがあるので待つ
-        let name = getUserName(e.source.userId).then(() => {
-            console.log(`名前は${name}`)
+        getUserName(e.source.userId).then((name) => {
+            const name = name;
+            console.log(`名前は${name}`);
             const tempTexts = [
                 "会話実装めんどくさすぎてはげそうだなも!",
                 "ぼくと話す前に早く借金返せだなも！",
@@ -178,10 +179,11 @@ function handleEvent(event) {
 }
 
 function getUserName(userID) {
-    const userId = userID;
-    const pro = client.getProfile(userId).then(()=> {
-        return pro.displayName;
-    })  
+    return new Promise(function(resolve, reject) {
+        const userId = userID;
+        const pro = client.getProfile(userId);
+        resolve(pro.displayName);
+    })
 }
 
 // listen on port
