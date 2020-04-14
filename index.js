@@ -38,20 +38,19 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
     //パターンにないメッセージが来た時にランダムに返信メッセージを決める
     function tempResponse(e, callback) {
-        const tempTexts= [];
         //おそらくプロフィール情報の取得に時間がかかってnameにundefindが入ることがあるので待つ
-        let name = getUserName(e.source.userId, function() {
+        let name = getUserName(e.source.userId).then(() => {
             console.log(`名前は${name}`)
-            tempTexts = [
+            const tempTexts = [
                 "会話実装めんどくさすぎてはげそうだなも!",
                 "ぼくと話す前に早く借金返せだなも！",
                 "だなも！",
                 "今回の増築代金として，1000000ベル，ローンを組ませていただくだなも！",
                 `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
             ]
-        });
-        let random = Math.floor( Math.random() * tempTexts.length );
-        callback(e, tempTexts[random]);
+            let random = Math.floor( Math.random() * tempTexts.length );
+            callback(e, tempTexts[random]);
+        })
     }
 
     function databaseACCESS(e, callback) {
