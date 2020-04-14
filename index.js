@@ -120,20 +120,22 @@ app.post('/callback', line.middleware(config), (req, res) => {
     }
 
     function fetchStockPrices(e) {
-        dbclient.connect();
-        dbclient.query(`SELECT time, stock_price FROM stock_price_tb WHERE user_id='${e.source.userId}';`), (err, res) => {
-            if(err) {
-                console.log(err);
-                replyMessage(e, "株価一覧取得に失敗しただなも");
-            } else {
-                console.log("データ取得完了");
-                console.log(res);
-                dbclient.end();
-                console.log("update client was closed");
-                replyMessage(e, "これが株価一覧だなも")
-            }
-        }
+        dbclient.connect().then((res) => {
+            dbclient.query(`SELECT time, stock_price FROM stock_price_tb WHERE user_id='${e.source.userId}';`, (err, res) => {
+                if(err) {
+                    console.log(err);
+                    replyMessage(e, "株価一覧取得に失敗しただなも");
+                } else {
+                    console.log("データ取得完了");
+                    console.log(res);
+                    dbclient.end();
+                    console.log("update client was closed");
+                    replyMessage(e, "これが株価一覧だなも")
+                }
+            }); 
+        });
     }
+
 
 
     function databaseACCESS(e, callback) {
