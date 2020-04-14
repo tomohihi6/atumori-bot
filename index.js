@@ -79,7 +79,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 console.log(err);
                 console.log("エラー起こってるで")
                 dbclient.end();
-                replyConfirmTemplate(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, JSON.stringify({name: "updateStockPrice", stockP: stockPrice}), "no");
+                replyConfirmTemplate(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, JSON.stringify({name: "updateStockPrice", stockP: stockPrice, time: yyyymmddampm}), "no");
             }
             else {
                 console.log("データはインサートしてるみたい")
@@ -96,9 +96,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
         console.log(e.postback.data);
         if(JSON.parse(e.postback.data).name == "updateStockPrice") {
             const stockPrice = JSON.parse(e.postback.data).stockP;
+            const time = JSON.parse(e.postback.data).time;
             console.log(`株価は${stockPrice}`);
             dbclient.connect();
-            dbclient.query(`UPDATE stock_price_tb SET stock_price='${stockPrice}';`, 
+            dbclient.query(`UPDATE stock_price_tb SET stock_price='${stockPrice}' WHERE user_id='${e.source.userId} AND time='${time}';`, 
             (err, res) => {
                 if(err) {
                     console.log(err);
