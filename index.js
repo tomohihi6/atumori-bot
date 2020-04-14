@@ -37,9 +37,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
     let events_processed = [];
 
     //パターンにないメッセージが来た時にランダムに返信メッセージを決める
-    async function tempResponse(e) {
+    function tempResponse(e, callback) {
         //おそらくプロフィール情報の取得に時間がかかってnameにundefindが入ることがあるので待つ
-        let name = await getUserName(e.source.userId);
+        let name = getUserName(e.source.userId);
         // console.log(`名前は${name}`)
         const tempTexts = [
             "会話実装めんどくさすぎてはげそうだなも!",
@@ -49,10 +49,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
             `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
         ]
         let random = Math.floor( Math.random() * tempTexts.length );
-        events_processed.push(client.replyMessage(e.replyToken, {
-            type: "text",
-            text: tempTexts[random]
-        }));  
+        callback(tempTexts);
     }
 
     function databaseACCESS(e, callback) {
@@ -143,7 +140,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;    
                     
                      default :
-                        tempResponse(event).then(() => {console.log("イベント終了")})
+                        tempResponse(event, replyDatabase).then(() => {console.log("イベント終了")})
                         break;
                         
                 }
