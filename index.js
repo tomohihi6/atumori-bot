@@ -135,9 +135,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         text: "はい"
                     },
                     {
-                        type: "unti",
+                        type: "message",
                         label: "いいえ",
-                        data: JSON.stringify({"action":"no"})
+                        text: "いいえ"
                     }
                 ],
             }
@@ -205,7 +205,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             }
         } else if(event.type =="unti") {
-            console.log("うんち！")
+            console.log("うんち")
         }
         console.log(req.body);
         console.log(req.body.events[0].source)
