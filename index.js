@@ -85,15 +85,11 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     console.log(row);
                     save = row
                 }
-
+                dbclient.end((err, res))
+                console.log(`select client was closed`)
+                callback(e, save.user_id);
+            })
                 
-            }).then(() => {
-                dbclient.end().then(() => {
-                    console.log(`select client was closed`)
-                    callback(e, save.user_id);
-                });
-                
-            });
         })    
         
     }
