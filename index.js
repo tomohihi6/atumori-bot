@@ -78,27 +78,25 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
     function databaseACCESS(e, callback) {
         //データベースに接続
-        try {
-            dbclient.connect();
-        } catch(err) {
-            console.error(err);
-        }
-        
-        let save;
-        //データベースの命令文（クエリ）をデータベースに送るための文
-        dbclient.query('SELECT * FROM  stock_price_tb', callback, (err, res)=> {
-            if (err) console.error(err);
-            for (let row of res.rows) {
-                console.log(row);
-                save = row
-            }
+        dbclient.connect().then((res) => {
+            console.log(res);
+            let save;
+            //データベースの命令文（クエリ）をデータベースに送るための文
+            dbclient.query('SELECT * FROM  stock_price_tb', callback, (err, res)=> {
+                if (err) console.error(err);
+                for (let row of res.rows) {
+                    console.log(row);
+                    save = row
+                }
 
-            dbclient.end().then(() => {
-                console.log("select client was closed")
-                callback(e, save.user_id);
-            })
-            
-        });
+                dbclient.release(true).then((res) => {
+                    console.log(`${res} select client was closed`)
+                    callback(e, save.user_id);
+                })
+                
+            });
+        })    
+        
     }
 
     function replyMessage(e, param) {
