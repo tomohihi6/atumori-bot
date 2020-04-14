@@ -74,7 +74,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         const displayTimeMessage = year + '/' + month + '/' + day + '/' + x;
         const yyyymmddampm = year + '/' + month + '/' + day + '/' + ampm;
         
-        console.log(time);
+        console.log(yyyymmddampm);
         dbclient.connect();
         dbclient.query(`INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '${yyyymmddampm}');`, 
         callback, (err, res) => {
