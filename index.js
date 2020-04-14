@@ -53,22 +53,36 @@ app.post('/callback', line.middleware(config), (req, res) => {
     }
 
     function insertStockPrice(e, userId, stockPrice, callback) {
+        //数字の0詰めを実装する関数
+        var toDoubleDigits = function(num) {
+            num += "";
+            if (num.length === 1) {
+              num = "0" + num;
+            }
+           return num;     
+        }
+        //とりあえず受け取った株価をINT型に
         const sP = parseInt(stockPrice);
+
         let date = new Date();
-        let month = date.getMonth() + 1 ;
-        let day = date.getDate() ;
+        let year = date.getFullYear();
+        let month = toDoubleDigits(date.getMonth() + 1);
+        let day = toDoubleDigits(date.getDate());
         let hour = date.getHours();
-        let ampm = (hour < 12) ? "00" : "11";
-        const time = parseInt('' + month + day + ampm);
+        let ampm = (hour < 12) ? "0" : "1";
+        let x = (ampm) ? "午後" : "午前";
+        const displayTimeMessage = year + '/' + month + '/' + day + '/' + x;
+        const yyyymmddampm = year + '/' + month + '/' + day + '/' + ampm;
+        
         console.log(time);
         dbclient.connect();
-        dbclient.query(`INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '${time}');`, 
+        dbclient.query(`INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '${yyyymmddampm}');`, 
         callback, (err, res) => {
             if (err) console.log(err);
             console.log(res)
             dbclient.end();
             console.log("insert client was closed")
-            callback(e, "テスト");
+            callback(e, `${displayTimeMessage}として株価${stockPrice}を記録しただなも`);
         });
     }
 
