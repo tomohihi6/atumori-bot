@@ -76,6 +76,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
     function replyDatabase(param) {
         console.log(`${param}は正常に取得されています`);
+        events_processed.push(client.replyMessage(event.replyToken, {
+            type: "text",
+            text: param
+        }));
     }
 
     // イベントオブジェクトを順次処理。
