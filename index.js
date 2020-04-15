@@ -68,7 +68,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         let day = toDoubleDigits(date.getDate());
         let hour = date.getHours();
         console.log(hour);
-        let ampm = (hour < 12) ? "0" : "1";
+        let ampm = (parseInt(hour) < 12) ? "0" : "1";
         console.log(ampm);
         let x = "";
         if (ampm = "0") x = "午前"
