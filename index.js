@@ -52,29 +52,13 @@ app.post('/callback', line.middleware(config), (req, res) => {
         })
     }
 
-    function insertStockPrice(e, userId, stockPrice) {
-        //数字の0詰めを実装する関数
-        var toDoubleDigits = function(num) {
-            num += "";
-            if (num.length === 1) {
-              num = "0" + num;
-            }
-           return num;     
-        }
-
-        let date = new Date();
-        let year = date.getFullYear();
-        let month = toDoubleDigits(date.getMonth() + 1);
-        let day = toDoubleDigits(date.getDate());
-        let hour = date.getHours();
-        console.log(hour);
-        let ampm = (hour < 12) ? "0" : "1";
-        console.log(ampm);
+    function insertStockPrice(e, userId, stockPrice) {   
+        const yyyymmddampm = getCurrentTime();
         let x = "";
         if (ampm == "0") x = "午前"
         else if(ampm == "1") x = "午後"
         const displayTimeMessage = year + '/' + month + '/' + day + '/' + x;
-        const yyyymmddampm = year + '/' + month + '/' + day + '/' + ampm;
+        
         
         console.log(yyyymmddampm);
         dbclient.connect();
@@ -146,6 +130,28 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             }); 
         });
+    }
+
+    function fetchMaxStock(e) {
+        dbclient.connect().then((res) => {
+            const time = getCurrentTime();
+            dbclient.query(`SELECT user_id, stock_price FROM stock_price_tb WHERE time='1' ORDER BY stock_price DESC;`, 
+            (err, res) => {
+                if(err) {
+                    console.log(err);
+                    replyMessage(e, "株価最高値の取得に失敗しただなも");
+                } else {
+                    console.log("データ取得完了");
+                    console.log(res);
+                    dbclient.end();
+                    console.log("fetchMax client was closed");
+                    let replyText = "";
+                    const maxPrice = res.rows[0].stock_price;
+                    replyMessage(e, maxPrice)
+                }
+            }); 
+            })
+        })
     }
 
 
@@ -305,8 +311,25 @@ function getUserName(userID) {
 }
 
 function getCurrentTime() {
-    const date = new Date();
+    //数字の0詰めを実装する関数
+    var toDoubleDigits = function(num) {
+        num += "";
+        if (num.length === 1) {
+            num = "0" + num;
+        }
+        return num;     
+    
+    }
+    let date = new Date();
+    let year = date.getFullYear();
+    let month = toDoubleDigits(date.getMonth() + 1);
+    let day = toDoubleDigits(date.getDate());
+    let hour = date.getHours();
+    console.log(hour);
+    let ampm = (hour < 12) ? "0" : "1";
+    return (year + '/' + month + '/' + day + '/' + ampm);
 }
+
 
 // listen on port
 const port = process.env.PORT || 3000;
