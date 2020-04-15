@@ -67,10 +67,12 @@ app.post('/callback', line.middleware(config), (req, res) => {
         let month = toDoubleDigits(date.getMonth() + 1);
         let day = toDoubleDigits(date.getDate());
         let hour = date.getHours();
+        console.log(hour);
         let ampm = (hour < 12) ? "0" : "1";
+        console.log(ampm);
         let x = "";
         if (ampm = "0") x = "午前"
-        else x = "午後"
+        else if(ampm = "1") x = "午後"
         const displayTimeMessage = year + '/' + month + '/' + day + '/' + x;
         const yyyymmddampm = year + '/' + month + '/' + day + '/' + ampm;
         
@@ -136,7 +138,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         let data = time.split("/")
                         if (data[3] == "0") {
                             replyText += `${data[0]}年${data[1]}月${data[2]}日午前の株価:${row.stock_price}\n`
-                        } else {
+                        } else if(data[3] == "1") {
                             replyText += `${data[0]}年${data[1]}月${data[2]}日午後の株価:${row.stock_price}\n`
                         }
                     })
