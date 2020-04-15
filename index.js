@@ -148,7 +148,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     console.log("fetchMax client was closed");
                     let replyText = "";
                     const maxPrice = res.rows[0].stock_price;
-                    replyMessage(e, maxPrice)
+                    getUserName(res.rows[0].user_id).then((name) => {
+                        console.log(`名前は${name}`);
+                        replyMessage(e, `今の時間の最高値は${name}さんの${maxPrice}ベルだなも!`);  
+                    })
                 }
             }); 
         })
