@@ -58,7 +58,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         let x = "";
         if (data[3] == "0") x = "午前"
         else if(data[3] == "1") x = "午後"
-        const displayTimeMessage = year + '/' + month + '/' + day + '/' + x;
+        const displayTimeMessage = yyyymmddampm.splice(-1) + x;
         
         
         console.log(yyyymmddampm);
