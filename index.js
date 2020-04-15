@@ -150,7 +150,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     replyMessage(e, maxPrice)
                 }
             }); 
-            })
         })
     }
 
@@ -265,6 +264,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         
                     case "株価一覧":
                         fetchStockPrices(event);
+                        break;
+
+                    case "最高値": 
+                        fetchMaxStock(event);
                         break;
                     
                      default :
