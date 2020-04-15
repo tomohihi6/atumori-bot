@@ -54,7 +54,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
     function insertStockPrice(e, userId, stockPrice) {   
         const yyyymmddampm = getCurrentTime();
-        const date = yyyymmddampm.split("/");
+        const data = yyyymmddampm.split("/");
         let x = "";
         if (data[3] == "0") x = "午前"
         else if(data[3] == "1") x = "午後"
@@ -75,7 +75,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 console.log(res)
                 dbclient.end();
                 console.log("insert client was closed")
-                replyMessage(e, `${displayTimeMessage}として株価${stockPrice}を記録しただなも`);
+                replyMessage(e, `${displayTimeMessage}として株価${stockPrice}ベルを記録しただなも`);
             }
             
         });
@@ -122,9 +122,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         let time = row.time;
                         let data = time.split("/")
                         if (data[3] == "0") {
-                            replyText += `${data[0]}年${data[1]}月${data[2]}日午前の株価:${row.stock_price}\n`
+                            replyText += `${data[1]}月${data[2]}日午前の株価:${row.stock_price}ベル\n`
                         } else if(data[3] == "1") {
-                            replyText += `${data[0]}年${data[1]}月${data[2]}日午後の株価:${row.stock_price}\n`
+                            replyText += `${data[1]}月${data[2]}日午後の株価:${row.stock_price}ベル\n`
                         }
                     })
                     replyMessage(e, replyText)
