@@ -54,9 +54,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
     function insertStockPrice(e, userId, stockPrice) {   
         const yyyymmddampm = getCurrentTime();
+        const date = yyyymmddampm.split("/");
         let x = "";
-        if (ampm == "0") x = "午前"
-        else if(ampm == "1") x = "午後"
+        if (data[3] == "0") x = "午前"
+        else if(data[3] == "1") x = "午後"
         const displayTimeMessage = year + '/' + month + '/' + day + '/' + x;
         
         
