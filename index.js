@@ -136,7 +136,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
     function fetchMaxStock(e) {
         dbclient.connect().then((res) => {
             const time = getCurrentTime();
-            dbclient.query(`SELECT user_id, stock_price FROM stock_price_tb WHERE time='1' ORDER BY stock_price DESC;`, 
+            dbclient.query(`SELECT user_id, stock_price FROM stock_price_tb WHERE time='${time}' ORDER BY stock_price DESC;`, 
             (err, res) => {
                 if(err) {
                     console.log(err);
@@ -146,7 +146,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     console.log(res);
                     dbclient.end();
                     console.log("fetchMax client was closed");
-                    let replyText = "";
                     const maxPrice = res.rows[0].stock_price;
                     getUserName(res.rows[0].user_id).then((name) => {
                         console.log(`名前は${name}`);
