@@ -270,6 +270,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         } 
                         
                         case "余り物リスト": {
+                            const query = `SELCT leftover FROM leftover_tb;`;
                             fecthFromDatabase(query)
                             .then((res) => {
                                 let replyText = "";
