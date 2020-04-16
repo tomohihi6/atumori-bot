@@ -280,6 +280,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                                 });
                                 replyMessage(event, replyText);
                             }).catch((err) => {
+                                console.log(err);
                                 replyMessage(event, "余り物リスト取得に失敗しただなも");
                             })
                             break;
