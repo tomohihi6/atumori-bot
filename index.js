@@ -293,12 +293,17 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             const query = `SELECT user_id FROM leftover_tb WHERE leftover='${leftoverName}';`;
                             fetchFromDatabase(query)
                             .then((res) => {
-                                res.rows.forEach((row) => {
-                                    getUserName(row.user_id).then((name) => {
-                                        const replyText = `${leftoverName}は${name}さんが持ってるだなも！`;
-                                        replyMessage(event, replyText);
+                                if(res.rowCount != 0) {
+                                    res.rows.forEach((row) => {
+                                        getUserName(row.user_id).then((name) => {
+                                            const replyText = `${leftoverName}は${name}さんが持ってるだなも！`;
+                                            replyMessage(event, replyText);
+                                        })
                                     })
-                                })
+                                } else {
+                                    replyMessage(event, "leftoverName does not exist");
+                                }
+ 
                             }).catch((err) => {
                                 console.log(err);
                                 replyMessage(event, "存在しねえよ");
