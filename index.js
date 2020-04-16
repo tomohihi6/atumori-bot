@@ -127,7 +127,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }))
     }
 
-    const waitAnswer = false;
+    let waitAnswer = false;
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
         if(waitAnswer) {
