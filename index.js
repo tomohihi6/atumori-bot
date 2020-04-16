@@ -296,7 +296,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                                 res.rows.forEach((row) => {
                                     getUserName(row.user_id).then((name) => {
                                         const replyText = `${leftoverName}は${name}さんが持ってるだなも！`;
-                                        replyMessage(event, replyMessage);
+                                        replyMessage(event, replyText);
                                     })
                                 })
                             }).catch((err) => {
