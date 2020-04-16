@@ -24,6 +24,9 @@ const client = new line.Client(config);
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
 
+//入力待ちかどうかを検出する
+let waitAnswer = false;
+
 app.post('/callback', line.middleware(config), (req, res) => {
     const dbclient = new Client({
         connectionString: process.env.DATABASE_URL,
@@ -127,7 +130,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }))
     }
 
-    let waitAnswer = false;
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
         if(waitAnswer) {
