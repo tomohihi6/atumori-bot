@@ -255,7 +255,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     case "帰って": {
                         if (event.message.text == "帰って") {
                             replyMessage(event, "ひどいだなも");
-                            if (event.source.groupId == null) {
+                            if (event.source.groupId !== null) {
                                 client.leaveGroup(event.source.groupId);
                             }
                         }
