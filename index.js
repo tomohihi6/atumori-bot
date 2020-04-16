@@ -106,12 +106,32 @@ app.post('/callback', line.middleware(config), (req, res) => {
         } 
     }
 
+    function fecthFromDatabase(query) {
+        return new Promise((resolve, reject) => {
+            dbclient.connect().then((res) => {
+                dbclient.query(query, (err, res) => {
+                    if(err) {
+                        console.log(err);
+                        reject(err);
+                    } else {
+                        console.log("データベースクエリ完了");
+                        console.log(res.body);
+                        dbclient.end();
+                        console.log(resolve.Message);
+                        resolve(res);
+                    }
+                })
+            })
+        })
+    }
+
     function fetchStockPrices(e) {
         dbclient.connect().then((res) => {
             dbclient.query(`SELECT time, stock_price FROM stock_price_tb WHERE user_id='${e.source.userId}' ORDER BY time ASC;`, (err, res) => {
                 if(err) {
                     console.log(err);
-                    replyMessage(e, "株価一覧取得に失敗しただなも");
+                    //失敗時に呼ばれる関数
+                    replyMessag(e, "取得に失敗しただなも");
                 } else {
                     console.log("データ取得完了");
                     console.log(res);
@@ -266,7 +286,23 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;   
                         
                     case "株価一覧":
-                        fetchStockPrices(event);
+                        const query = `SELECT time, stock_price FROM stock_price_tb WHERE user_id='${e.source.userId}' ORDER BY time ASC;`;
+                        fecthFromDatabase(query)
+                        .then((res) => {
+                            let replyText = "";
+                            res.rows.forEach((row) => {
+                                let time = row.time;
+                                let data = time.split("/")
+                                if (data[3] == "0") {
+                                    replyText += `${data[1]}月${data[2]}日午前の株価:${row.stock_price}ベル\n`
+                                } else if(data[3] == "1") {
+                                    replyText += `${data[1]}月${data[2]}日午後の株価:${row.stock_price}ベル\n`
+                                }
+                             })
+                            replyMessage(event, replyText)
+                        }).catch((err) => {
+                            replyMessage(event, "株価取得に失敗しただなも");
+                        })
                         break;
 
                     case "最高値": 
@@ -310,8 +346,11 @@ function handleEvent(event) {
 function getUserName(userID) {
     return new Promise(function(resolve, reject) {
         const userId = userID;
-        client.getProfile(userId).then((profile) => {
+        client.getProfile(userId)
+        .then((profile) => {
             resolve(profile.displayName)
+        }).catch((err) => {
+            reject(err);
         })
     })
 }
