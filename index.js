@@ -254,9 +254,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
                     case "帰って": {
                         if (event.message.text == "帰って") {
-                            line_bot_api.reply_message(event.reply_token, replyMessage(e, "ひどいだなも"))
+                            replyMessage(e, "ひどいだなも");
                             if (event.source.group_id == null) {
-                                line_bot_api.leave_group(event.source.group_id);
+                                client.leave_group(event.source.group_id);
                             }
                         }
                         break;
