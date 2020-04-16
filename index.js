@@ -319,7 +319,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                                 if(res.rowCount != 0) {
                                     res.rows.forEach((row) => {
                                         const replyText = `${leftoverName}を削除しただなも`;
-                                        replyMessage(event, replyText);
+                                        replyMessage(event, `${leftoverName}を削除しただなも`);
                                     })
                                 } else {
                                     replyMessage(event, `${leftoverName} does not exit`);
