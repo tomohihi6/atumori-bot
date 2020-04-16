@@ -95,25 +95,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
         })
     }
 
-    function fetchMaxStock(e) {
-        dbclient.connect().then((res) => {
-
-            dbclient.query(`SELECT user_id, stock_price FROM stock_price_tb WHERE time='${time}' ORDER BY stock_price DESC;`, 
-            (err, res) => {
-                if(err) {
-                    console.log(err);
-                    replyMessage(e, "株価最高値の取得に失敗しただなも");
-                } else {
-                    console.log("データ取得完了");
-                    console.log(res);
-                    dbclient.end();
-                    console.log("fetchMax client was closed");
- 
-                }
-            }); 
-        })
-    }
-
     function replyMessage(e, param) {
         console.log(`${param}は正常に取得されています`);
         events_processed.push(client.replyMessage(e.replyToken, {
@@ -146,131 +127,157 @@ app.post('/callback', line.middleware(config), (req, res) => {
         }))
     }
 
+    const waitAnswer = false;
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
-        // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
-        if (event.type == "message" && event.message.type == "text"){
-            //数字だけのテキストかどうかを判定
-            let numFlug = true;
-            for(let i = 0; i < event.message.text.length; i++) {
-                //1文字ずつアスキーコードを比較して数字判定
-                let charCode = event.message.text.charCodeAt(i);
-                if(charCode < 48  || charCode > 57){
-                    numFlug = false;
-                    //１つでも数字以外の文字が見つかった場合for文終わり
-                    break;
-                }
-            }
-            if(numFlug) {
-                const stockPrice = event.message.text;
-                const userId = event.source.userId;
-                const yyyymmddampm = getCurrentTime();
-                const data = yyyymmddampm.split("/");
-                let x = "";
-                if (data[3] == "0") x = "午前"
-                else if(data[3] == "1") x = "午後"
-                const displayTimeMessage = yyyymmddampm.slice(0, -1) + x;
-
-                //株価を記録するためのSQL文
-                const query = `INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '${yyyymmddampm}');`;
-                
+        if(waitAnswer) {
+            if(event.message.text == "やっぱやめた") {
+                replyMessage(evnet, "わかっただなも");
+            } else {
+                const userID = event.source.userID;
+                const leftover = event.message.text;
+                const query = `INSERT INTO leftover_tb (user_id, leftover) VALUES ('${userID}', '${leftover}');`;
                 fecthFromDatabase(query)
                 .then((res) => {
-                    replyMessage(event, `${displayTimeMessage}として株価${stockPrice}ベルを記録しただなも`);
+                    console.log(res);
+                    replyMessage(event, "記録しただなも");
                 }).catch((err) => {
-                    replyConfirmTemplate(event, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, JSON.stringify({name: "updateStockPrice", stockP: stockPrice, time: yyyymmddampm}), JSON.stringify({name: "updateNo"}));
+                    console.log(err);
+                    replyMessage(event, "記録に失敗しただなも");
                 })
-
-                //数字以外のテキストの処理    
-            } else {
-                switch (event.message.text) {
-                    case "こんにちは":
-                        events_processed.push(client.replyMessage(event.replyToken, {
-                            type: "text",
-                            text: "どうもだなも!"
-                        }));
-                        break;
-    
-                    case "今の時刻は？": {
-                        var date = new Date()
-                        var month = date.getMonth() + 1 ;
-                        var day = date.getDate() ;
-                        var hour = date.getHours() ;
-                        var minute = date.getMinutes() ;
-                        var dayOfWeek = date.getDay();
-                        var dayOfWeekStr = [ "日", "月", "火", "水", "木", "金", "土" ][dayOfWeek] ;
-                        const time = `今は${month}月${day}日の${dayOfWeekStr}曜日${hour}時${minute}分だなも`
-                        events_processed.push(client.replyMessage(event.replyToken, {
-                            type: "text",
-                            text: time
-                        }))
-                        break;
-                    }
-    
-                    case "しずえは？": {
-                        events_processed.push(client.replyMessage(event.replyToken, {
-                            type: "text",
-                            text: "ノーコメントだなも"
-                        }));
-                        break;
-                    }
-
-                    case "株価一覧": {
-                        const query = `SELECT time, stock_price FROM stock_price_tb WHERE user_id='${event.source.userId}' ORDER BY time ASC;`;
-                        fecthFromDatabase(query)
-                        .then((res) => {
-                            let replyText = "";
-                            res.rows.forEach((row) => {
-                                let time = row.time;
-                                let data = time.split("/")
-                                if (data[3] == "0") {
-                                    replyText += `${data[1]}月${data[2]}日午前の株価:${row.stock_price}ベル\n`
-                                } else if(data[3] == "1") {
-                                    replyText += `${data[1]}月${data[2]}日午後の株価:${row.stock_price}ベル\n`
-                                }
-                             })
-                            replyMessage(event, replyText)
-                        }).catch((err) => {
-                            replyMessage(event, "株価取得に失敗しただなも");
-                        })
-                        break;
-                    }
-
-                    case "最高値": {
-                        const time = getCurrentTime();
-                        const query = `SELECT user_id, stock_price FROM stock_price_tb WHERE time='${time}' ORDER BY stock_price DESC;`;
-                        fecthFromDatabase(query)
-                        .then((res) => {
-                            const maxPrice = res.rows[0].stock_price;
-                            getUserName(res.rows[0].user_id).then((name) => {
-                                console.log(`名前は${name}`);
-                                replyMessage(event, `今の時間の最高値は${name}さんの${maxPrice}ベルだなも!`);  
-                            })
-                        }).catch((err) => {
-                            replyMessage(event, "株価最高値の取得に失敗しただなも");
-                        })
-                        break;
-                    }
-
-                    case "帰って": {
-                        if (event.message.text == "帰って") {
-                            replyMessage(event, "ひどいだなも");
-                            if (event.source.groupId !== null) {
-                                client.leaveGroup(event.source.groupId);
-                            }
-                        }
-                        break;
-                    }    
-                    
-                     default :
-                        tempResponse(event, replyMessage)
-                        break;
-                        
-                }
             }
-        } else if(event.type == "postback") {
-            updateStockPrice(event);
+            waitAnswer = false;
+        } else {
+            // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
+            if (event.type == "message" && event.message.type == "text"){
+                //数字だけのテキストかどうかを判定
+                let numFlug = true;
+                for(let i = 0; i < event.message.text.length; i++) {
+                    //1文字ずつアスキーコードを比較して数字判定
+                    let charCode = event.message.text.charCodeAt(i);
+                    if(charCode < 48  || charCode > 57){
+                        numFlug = false;
+                        //１つでも数字以外の文字が見つかった場合for文終わり
+                        break;
+                    }
+                }
+                if(numFlug) {
+                    const stockPrice = event.message.text;
+                    const userId = event.source.userId;
+                    const yyyymmddampm = getCurrentTime();
+                    const data = yyyymmddampm.split("/");
+                    let x = "";
+                    if (data[3] == "0") x = "午前"
+                    else if(data[3] == "1") x = "午後"
+                    const displayTimeMessage = yyyymmddampm.slice(0, -1) + x;
+
+                    //株価を記録するためのSQL文
+                    const query = `INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '${yyyymmddampm}');`;
+                    
+                    fecthFromDatabase(query)
+                    .then((res) => {
+                        replyMessage(event, `${displayTimeMessage}として株価${stockPrice}ベルを記録しただなも`);
+                    }).catch((err) => {
+                        replyConfirmTemplate(event, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, JSON.stringify({name: "updateStockPrice", stockP: stockPrice, time: yyyymmddampm}), JSON.stringify({name: "updateNo"}));
+                    })
+
+                    //数字以外のテキストの処理    
+                } else {
+                    switch (event.message.text) {
+                        case "こんにちは":
+                            events_processed.push(client.replyMessage(event.replyToken, {
+                                type: "text",
+                                text: "どうもだなも!"
+                            }));
+                            break;
+        
+                        case "今の時刻は？": {
+                            var date = new Date()
+                            var month = date.getMonth() + 1 ;
+                            var day = date.getDate() ;
+                            var hour = date.getHours() ;
+                            var minute = date.getMinutes() ;
+                            var dayOfWeek = date.getDay();
+                            var dayOfWeekStr = [ "日", "月", "火", "水", "木", "金", "土" ][dayOfWeek] ;
+                            const time = `今は${month}月${day}日の${dayOfWeekStr}曜日${hour}時${minute}分だなも`
+                            events_processed.push(client.replyMessage(event.replyToken, {
+                                type: "text",
+                                text: time
+                            }))
+                            break;
+                        }
+        
+                        case "しずえは？": {
+                            events_processed.push(client.replyMessage(event.replyToken, {
+                                type: "text",
+                                text: "ノーコメントだなも"
+                            }));
+                            break;
+                        }
+
+                        case "株価一覧": {
+                            const query = `SELECT time, stock_price FROM stock_price_tb WHERE user_id='${event.source.userId}' ORDER BY time ASC;`;
+                            fecthFromDatabase(query)
+                            .then((res) => {
+                                let replyText = "";
+                                res.rows.forEach((row) => {
+                                    let time = row.time;
+                                    let data = time.split("/")
+                                    if (data[3] == "0") {
+                                        replyText += `${data[1]}月${data[2]}日午前の株価:${row.stock_price}ベル\n`
+                                    } else if(data[3] == "1") {
+                                        replyText += `${data[1]}月${data[2]}日午後の株価:${row.stock_price}ベル\n`
+                                    }
+                                })
+                                replyMessage(event, replyText)
+                            }).catch((err) => {
+                                replyMessage(event, "株価取得に失敗しただなも");
+                            })
+                            break;
+                        }
+
+                        case "最高値": {
+                            const time = getCurrentTime();
+                            const query = `SELECT user_id, stock_price FROM stock_price_tb WHERE time='${time}' ORDER BY stock_price DESC;`;
+                            fecthFromDatabase(query)
+                            .then((res) => {
+                                const maxPrice = res.rows[0].stock_price;
+                                getUserName(res.rows[0].user_id).then((name) => {
+                                    console.log(`名前は${name}`);
+                                    replyMessage(event, `今の時間の最高値は${name}さんの${maxPrice}ベルだなも!`);  
+                                })
+                            }).catch((err) => {
+                                replyMessage(event, "株価最高値の取得に失敗しただなも");
+                            })
+                            break;
+                        }
+
+                        case "余り物記録" : {
+                            replyMessage(event, "記録したい物の名前を入力して欲しいだなも");
+                            waitAnswer = true;
+                        }
+
+                        case "帰って": {
+                            if (event.message.text == "帰って") {
+                                replyMessage(event, "ひどいだなも");
+                                if (event.source.groupId !== null) {
+                                    client.leaveGroup(event.source.groupId);
+                                }
+                            }
+                            break;
+                        }    
+                        
+                        default :
+                            tempResponse(event, replyMessage)
+                            break;
+                            
+                    }
+                }
+            } else if(event.type == "postback") {
+                updateStockPrice(event);
+            }
         }
+  
         console.log(req.body);
         console.log(req.body.events[0].source)
     });
