@@ -52,34 +52,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
         })
     }
 
-    function insertStockPrice(e, userId, stockPrice) {   
-        const yyyymmddampm = getCurrentTime();
-        const data = yyyymmddampm.split("/");
-        let x = "";
-        if (data[3] == "0") x = "午前"
-        else if(data[3] == "1") x = "午後"
-        const displayTimeMessage = yyyymmddampm.slice(0, -1) + x;
-        
-        
-        console.log(yyyymmddampm);
-        dbclient.connect();
-        dbclient.query(`INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '${yyyymmddampm}');`, (err, res) => {
-            if (err) {
-                console.log(err);
-                console.log("エラー起こってるで")
-                replyConfirmTemplate(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, JSON.stringify({name: "updateStockPrice", stockP: stockPrice, time: yyyymmddampm}), JSON.stringify({name: "updateNo"}));
-            }
-            else {
-                console.log("データはインサートしてるみたい")
-                console.log(res)
-                dbclient.end();
-                console.log("insert client was closed")
-                replyMessage(e, `${displayTimeMessage}として株価${stockPrice}ベルを記録しただなも`);
-            }
-            
-        });
-    }
-
     function updateStockPrice(e) {
         console.log(e.postback.data);
         if(JSON.parse(e.postback.data).name == "updateStockPrice") {
