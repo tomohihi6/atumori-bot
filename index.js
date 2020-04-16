@@ -312,7 +312,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         }
 
                         case /.*削除/.test(event.message.text): {
-                            const leftoverName = event.message.text.replace("欲しい", "");
+                            const leftoverName = event.message.text.replace("削除", "");
                             const query = `DELETE FROM leftover_tb WHERE leftover='${leftoverName}';`;
                             fetchFromDatabase(query)
                             .then((res) => {
