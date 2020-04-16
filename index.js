@@ -136,9 +136,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
             if(event.message.text == "やっぱやめた") {
                 replyMessage(evnet, "わかっただなも");
             } else {
-                const userID = event.source.userID;
+                const userId = event.source.userId;
                 const leftover = event.message.text;
-                const query = `INSERT INTO leftover_tb (user_id, leftover) VALUES ('${userID}', '${leftover}');`;
+                const query = `INSERT INTO leftover_tb (user_id, leftover) VALUES ('${userId}', '${leftover}');`;
                 fecthFromDatabase(query)
                 .then((res) => {
                     console.log(res);
@@ -267,7 +267,22 @@ app.post('/callback', line.middleware(config), (req, res) => {
                                 }
                             }
                             break;
-                        }    
+                        } 
+                        
+                        case "余り物リスト": {
+                            fecthFromDatabase(query)
+                            .then((res) => {
+                                let replyText = "";
+                                res.rows.forEach((row) => {
+                                    let leftover = row.leftover;
+                                    replyText += `${leftover}\n`;
+                                });
+                                replyMessage(event, replyText.splite(-1));
+                            }).catch((err) => {
+                                replyMessage(event, "株価取得に失敗しただなも");
+                            })
+                            break;
+                        }
                         
                         default :
                             tempResponse(event, replyMessage)
