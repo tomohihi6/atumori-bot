@@ -301,7 +301,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                                         })
                                     })
                                 } else {
-                                    replyMessage(event, "leftoverName does not exist");
+                                    replyMessage(event, `${leftoverName} does not exist`);
                                 }
  
                             }).catch((err) => {
