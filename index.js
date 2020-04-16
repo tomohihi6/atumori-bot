@@ -114,9 +114,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         reject(err);
                     } else {
                         console.log("データベースクエリ完了");
-                        console.log(res.body);
+                        console.log(res);
                         dbclient.end();
-                        console.log(resolve.Message);
                         resolve(res);
                     }
                 })
@@ -124,37 +123,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
         })
     }
 
-    function fetchStockPrices(e) {
-        dbclient.connect().then((res) => {
-            dbclient.query(`SELECT time, stock_price FROM stock_price_tb WHERE user_id='${e.source.userId}' ORDER BY time ASC;`, (err, res) => {
-                if(err) {
-                    console.log(err);
-                    //失敗時に呼ばれる関数
-                    replyMessag(e, "取得に失敗しただなも");
-                } else {
-                    console.log("データ取得完了");
-                    console.log(res);
-                    dbclient.end();
-                    console.log("update client was closed");
-                    let replyText = "";
-                    res.rows.forEach((row) => {
-                        let time = row.time;
-                        let data = time.split("/")
-                        if (data[3] == "0") {
-                            replyText += `${data[1]}月${data[2]}日午前の株価:${row.stock_price}ベル\n`
-                        } else if(data[3] == "1") {
-                            replyText += `${data[1]}月${data[2]}日午後の株価:${row.stock_price}ベル\n`
-                        }
-                    })
-                    replyMessage(e, replyText)
-                }
-            }); 
-        });
-    }
-
     function fetchMaxStock(e) {
         dbclient.connect().then((res) => {
-            const time = getCurrentTime();
+
             dbclient.query(`SELECT user_id, stock_price FROM stock_price_tb WHERE time='${time}' ORDER BY stock_price DESC;`, 
             (err, res) => {
                 if(err) {
@@ -165,37 +136,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     console.log(res);
                     dbclient.end();
                     console.log("fetchMax client was closed");
-                    const maxPrice = res.rows[0].stock_price;
-                    getUserName(res.rows[0].user_id).then((name) => {
-                        console.log(`名前は${name}`);
-                        replyMessage(e, `今の時間の最高値は${name}さんの${maxPrice}ベルだなも!`);  
-                    })
+ 
                 }
             }); 
         })
-    }
-
-
-
-    function databaseACCESS(e, callback) {
-        //データベースに接続
-        dbclient.connect().then((res) => {
-            console.log(res);
-            let save;
-            //データベースの命令文（クエリ）をデータベースに送るための文
-            dbclient.query('SELECT * FROM  stock_price_tb', callback, (err, res)=> {
-                if (err) console.error(err);
-                for (let row of res.rows) {
-                    console.log(row);
-                    save = row
-                }
-                dbclient.end()
-                console.log(`select client was closed`)
-                callback(e, save.user_id);
-            })
-                
-        })    
-        
     }
 
     function replyMessage(e, param) {
@@ -297,10 +241,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         }));
                         break;
                     
-                    case "データベース":
-                        databaseACCESS(event, replyMessage)
-                        break;   
-                        
                     case "株価一覧":
                         const query = `SELECT time, stock_price FROM stock_price_tb WHERE user_id='${event.source.userId}' ORDER BY time ASC;`;
                         fecthFromDatabase(query)
@@ -322,7 +262,18 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;
 
                     case "最高値": 
-                        fetchMaxStock(event);
+                        const time = getCurrentTime();
+                        const query = `SELECT user_id, stock_price FROM stock_price_tb WHERE time='${time}' ORDER BY stock_price DESC;`;
+                        fecthFromDatabase(query)
+                        .then((res) => {
+                            const maxPrice = res.rows[0].stock_price;
+                            getUserName(res.rows[0].user_id).then((name) => {
+                                console.log(`名前は${name}`);
+                                replyMessage(event, `今の時間の最高値は${name}さんの${maxPrice}ベルだなも!`);  
+                            })
+                        }).catch((err) => {
+                            replyMessage(event, "株価最高値の取得に失敗しただなも");
+                        })
                         break;
                     
                      default :
