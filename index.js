@@ -287,6 +287,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             })
                             break;
                         }
+
+                        case /+欲しい/: {
+                            console.log("欲しい動いてるよ");
+                        }
                         
                         default :
                             tempResponse(event, replyMessage)
