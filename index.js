@@ -270,7 +270,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         } 
                         
                         case "余り物リスト": {
-                            const query = `SELCT leftover FROM leftover_tb;`;
+                            const query = `SELECT leftover FROM leftover_tb;`;
                             fecthFromDatabase(query)
                             .then((res) => {
                                 let replyText = "";
@@ -280,7 +280,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                                 });
                                 replyMessage(event, replyText.splite(-1));
                             }).catch((err) => {
-                                replyMessage(event, "株価取得に失敗しただなも");
+                                replyMessage(event, "余り物リスト取得に失敗しただなも");
                             })
                             break;
                         }
