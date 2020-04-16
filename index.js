@@ -199,10 +199,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         var minute = date.getMinutes() ;
                         var dayOfWeek = date.getDay();
                         var dayOfWeekStr = [ "日", "月", "火", "水", "木", "金", "土" ][dayOfWeek] ;
-                        const time = `今は${month}月${day}日の${dayOfWeekStr}曜日${hour}時${minute}分だなも`
+                        const timer = `今は${month}月${day}日の${dayOfWeekStr}曜日${hour}時${minute}分だなも`
                         events_processed.push(client.replyMessage(event.replyToken, {
                             type: "text",
-                            text: time
+                            text: timer
                         }))
                         break;
     
