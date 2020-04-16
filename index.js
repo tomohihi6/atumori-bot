@@ -275,7 +275,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             .then((res) => {
                                 let replyText = "";
                                 for(let i = 0; i < res.rows.length; i++) {
-                                    replyText += `${res.rows[i]}`
+                                    replyText += `${res.rows[i].leftover}`
                                     if(i !== res.rows.length - 1)　{
                                         replyText += `\n`;
                                     }                                    
