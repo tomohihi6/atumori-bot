@@ -286,7 +286,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         break;   
                         
                     case "株価一覧":
-                        const query = `SELECT time, stock_price FROM stock_price_tb WHERE user_id='${e.source.userId}' ORDER BY time ASC;`;
+                        const query = `SELECT time, stock_price FROM stock_price_tb WHERE user_id='${event.source.userId}' ORDER BY time ASC;`;
                         fecthFromDatabase(query)
                         .then((res) => {
                             let replyText = "";
