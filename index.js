@@ -260,7 +260,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             }
                         }
                         break;
-                            
+                    }    
                     
                      default :
                         tempResponse(event, replyMessage)
