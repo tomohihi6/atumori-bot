@@ -67,7 +67,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
             if (err) {
                 console.log(err);
                 console.log("エラー起こってるで")
-                dbclient.end();
                 replyConfirmTemplate(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, JSON.stringify({name: "updateStockPrice", stockP: stockPrice, time: yyyymmddampm}), JSON.stringify({name: "updateNo"}));
             }
             else {
@@ -247,7 +246,24 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             }
             if(numFlug) {
-                insertStockPrice(event, event.source.userId, event.message.text,);
+                const stockPrice = event.message.text;
+                const userId = evnet.sourve.userId;
+                const yyyymmddampm = getCurrentTime();
+                const data = yyyymmddampm.split("/");
+                let x = "";
+                if (data[3] == "0") x = "午前"
+                else if(data[3] == "1") x = "午後"
+                const displayTimeMessage = yyyymmddampm.slice(0, -1) + x;
+
+                //株価を記録するためのSQL文
+                const query = `INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '${yyyymmddampm}');`;
+                
+                fecthFromDatabase(query)
+                .then((res) => {
+                    replyMessage(event, `${displayTimeMessage}として株価${stockPrice}ベルを記録しただなも`);
+                }).catch((err) => {
+                    replyConfirmTemplate(event, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, JSON.stringify({name: "updateStockPrice", stockP: stockPrice, time: yyyymmddampm}), JSON.stringify({name: "updateNo"}));
+                })
 
                 //数字以外のテキストの処理    
             } else {
