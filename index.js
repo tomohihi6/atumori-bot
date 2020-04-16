@@ -301,7 +301,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                                 })
                             }).catch((err) => {
                                 console.log(err);
-                                replyMessage(event, err.body);
+                                replyMessage(event, "存在しねえよ");
                             })
                             break;
                         }
