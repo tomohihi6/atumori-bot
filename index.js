@@ -289,8 +289,20 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         }
 
                         case /.*欲しい/.test(event.message.text): {
-                            console.log("欲しい動いてるよ");
-                            replyMessage(event, "欲しい動いてるよ");
+                            const leftoverName = event.message.text;
+                            const query = `SELECT user_id FROM leftover_tb WHERE leftover='${leftoverName}';`;
+                            fetchFromDatabase(query)
+                            .then((res) => {
+                                res.rows.forEach((row) => {
+                                    getUserName(row.user_id).then((name) => {
+                                        const replyText = `${leftoverName}は${name}さんが持ってるだなも！`;
+                                        replyMessage(event, replyMessage);
+                                    })
+                                })
+                            }).catch((err) => {
+                                console.log(err);
+                                replyMessage(event, err.body);
+                            })
                             break;
                         }
                         
