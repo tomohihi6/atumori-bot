@@ -289,7 +289,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         }
 
                         case /.*欲しい/.test(event.message.text): {
-                            const leftoverName = event.message.text;
+                            const leftoverName = event.message.text.replace("欲しい", "");
                             const query = `SELECT user_id FROM leftover_tb WHERE leftover='${leftoverName}';`;
                             fetchFromDatabase(query)
                             .then((res) => {
