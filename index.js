@@ -274,12 +274,13 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             fecthFromDatabase(query)
                             .then((res) => {
                                 let replyText = "";
-                                res.rows.forEach((row) => {
-                                    let leftover = row.leftover;
-                                    replyText += `${leftover}\n`;
-                                });
-                                const text = replyText.split(0, -1);
-                                replyMessage(event, text);
+                                for(let i = 0; i < res.rows.length; i++) {
+                                    replyText += `${res.rows[i]}`
+                                    if(i !== res.rows.length - 1)　{
+                                        replyText += `\n`;
+                                    }                                    
+                                }
+                                replyMessage(event, replyText);
                             }).catch((err) => {
                                 console.log(err);
                                 replyMessage(event, "余り物リスト取得に失敗しただなも");
