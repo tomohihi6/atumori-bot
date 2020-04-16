@@ -278,8 +278,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                                     let leftover = row.leftover;
                                     replyText += `${leftover}\n`;
                                 });
-                                replyText = replyText.split(0, -1);
-                                replyMessage(event, replyText);
+                                text = replyText.split(0, -1);
+                                replyMessage(event, text);
                             }).catch((err) => {
                                 console.log(err);
                                 replyMessage(event, "余り物リスト取得に失敗しただなも");
