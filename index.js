@@ -251,6 +251,16 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         })
                         break;
                     }
+
+                    case "帰って": {
+                        if (event.message.text == "帰って") {
+                            line_bot_api.reply_message(event.reply_token, replyMessage(e, "ひどいだなも"))
+                            if (event.source.group_id == null) {
+                                line_bot_api.leave_group(event.source.group_id)
+                            }
+                        }
+                        break;
+                            
                     
                      default :
                         tempResponse(event, replyMessage)
