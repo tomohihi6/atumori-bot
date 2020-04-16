@@ -247,7 +247,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
             }
             if(numFlug) {
                 const stockPrice = event.message.text;
-                const userId = evnet.sourve.userId;
+                const userId = event.sourve.userId;
                 const yyyymmddampm = getCurrentTime();
                 const data = yyyymmddampm.split("/");
                 let x = "";
