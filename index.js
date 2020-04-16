@@ -288,7 +288,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             break;
                         }
 
-                        case /.*欲しい/: {
+                        case /.*欲しい/.test(event.message.text): {
                             console.log("欲しい動いてるよ");
                             replyMessage(event, "欲しい動いてるよ");
                             break;
