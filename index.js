@@ -191,7 +191,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         }));
                         break;
     
-                    case "今の時刻は？":
+                    case "今の時刻は？": {
                         var date = new Date()
                         var month = date.getMonth() + 1 ;
                         var day = date.getDate() ;
@@ -199,21 +199,23 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         var minute = date.getMinutes() ;
                         var dayOfWeek = date.getDay();
                         var dayOfWeekStr = [ "日", "月", "火", "水", "木", "金", "土" ][dayOfWeek] ;
-                        const timer = `今は${month}月${day}日の${dayOfWeekStr}曜日${hour}時${minute}分だなも`
+                        const time = `今は${month}月${day}日の${dayOfWeekStr}曜日${hour}時${minute}分だなも`
                         events_processed.push(client.replyMessage(event.replyToken, {
                             type: "text",
-                            text: timer
+                            text: time
                         }))
                         break;
+                    }
     
-                    case "しずえは？":
+                    case "しずえは？": {
                         events_processed.push(client.replyMessage(event.replyToken, {
                             type: "text",
                             text: "ノーコメントだなも"
                         }));
                         break;
-                    
-                    case "株価一覧":
+                    }
+
+                    case "株価一覧": {
                         const query = `SELECT time, stock_price FROM stock_price_tb WHERE user_id='${event.source.userId}' ORDER BY time ASC;`;
                         fecthFromDatabase(query)
                         .then((res) => {
@@ -232,8 +234,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             replyMessage(event, "株価取得に失敗しただなも");
                         })
                         break;
+                    }
 
-                    case "最高値": 
+                    case "最高値": {
                         const time = getCurrentTime();
                         const query = `SELECT user_id, stock_price FROM stock_price_tb WHERE time='${time}' ORDER BY stock_price DESC;`;
                         fecthFromDatabase(query)
@@ -247,6 +250,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             replyMessage(event, "株価最高値の取得に失敗しただなも");
                         })
                         break;
+                    }
                     
                      default :
                         tempResponse(event, replyMessage)
