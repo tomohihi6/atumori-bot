@@ -310,6 +310,29 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             })
                             break;
                         }
+
+                        case /.*削除/.test(event.message.text): {
+                            const leftoverName = event.message.text.replace("欲しい", "");
+                            const query = `DELETE FROM leftover_tb WHERE leftover='${leftoverName}';`;
+                            fetchFromDatabase(query)
+                            .then((res) => {
+                                if(res.rowCount != 0) {
+                                    res.rows.forEach((row) => {
+                                        getUserName(row.user_id).then((name) => {
+                                            const replyText = `${leftoverName}を削除しただなも`;
+                                            replyMessage(event, replyText);
+                                        })
+                                    })
+                                } else {
+                                    replyMessage(event, `${leftoverName} does not exit`);
+                                }
+ 
+                            }).catch((err) => {
+                                console.log(err);
+                                replyMessage(event, "存在しねえよ");
+                            })
+                            break;
+                        }
                         
                         default :
                             tempResponse(event, replyMessage)
