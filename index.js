@@ -278,6 +278,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                                     let leftover = row.leftover;
                                     replyText += `${leftover}\n`;
                                 });
+                                replyText = replyText.split(-1);
                                 replyMessage(event, replyText);
                             }).catch((err) => {
                                 console.log(err);
