@@ -80,7 +80,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
         } 
     }
 
-    function fecthFromDatabase(query) {
+    function fetchFromDatabase(query) {
         return new Promise((resolve, reject) => {
             dbclient.connect().then((res) => {
                 dbclient.query(query, (err, res) => {
@@ -139,7 +139,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 const userId = event.source.userId;
                 const leftover = event.message.text;
                 const query = `INSERT INTO leftover_tb (user_id, leftover) VALUES ('${userId}', '${leftover}');`;
-                fecthFromDatabase(query)
+                fetchFromDatabase(query)
                 .then((res) => {
                     console.log(res);
                     replyMessage(event, "記録しただなも");
@@ -176,7 +176,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     //株価を記録するためのSQL文
                     const query = `INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '${yyyymmddampm}');`;
                     
-                    fecthFromDatabase(query)
+                    fetchFromDatabase(query)
                     .then((res) => {
                         replyMessage(event, `${displayTimeMessage}として株価${stockPrice}ベルを記録しただなも`);
                     }).catch((err) => {
@@ -219,7 +219,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
                         case /株価一覧/.test(event.message.text): {
                             const query = `SELECT time, stock_price FROM stock_price_tb WHERE user_id='${event.source.userId}' ORDER BY time ASC;`;
-                            fecthFromDatabase(query)
+                            fetchFromDatabase(query)
                             .then((res) => {
                                 let replyText = "";
                                 res.rows.forEach((row) => {
@@ -241,7 +241,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         case /最高値/.test(event.message.text): {
                             const time = getCurrentTime();
                             const query = `SELECT user_id, stock_price FROM stock_price_tb WHERE time='${time}' ORDER BY stock_price DESC;`;
-                            fecthFromDatabase(query)
+                            fetchFromDatabase(query)
                             .then((res) => {
                                 const maxPrice = res.rows[0].stock_price;
                                 getUserName(res.rows[0].user_id).then((name) => {
@@ -271,7 +271,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         
                         case /余り物リスト/.test(event.message.text): {
                             const query = `SELECT leftover FROM leftover_tb;`;
-                            fecthFromDatabase(query)
+                            fetchFromDatabase(query)
                             .then((res) => {
                                 let replyText = "";
                                 for(let i = 0; i < res.rows.length; i++) {
