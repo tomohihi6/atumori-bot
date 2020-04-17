@@ -283,7 +283,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             fetchFromDatabase(query)
                             .then((res) => {
                                 const maxPrice = res.rows[0].stock_price;
-                                const decryptedUserId = res.rows[0].user_id;
+                                const decryptedUserId = getDecryptedString(res.rows[0].user_id);
                                 getUserName(decryptedUserId).then((name) => {
                                     console.log(`名前は${name}`);
                                     replyMessage(event, `今の時間の最高値は${name}さんの${maxPrice}ベルだなも!`);  
@@ -335,7 +335,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             .then((res) => {
                                 if(res.rowCount != 0) {
                                     res.rows.forEach((row) => {
-                                        const decryptedUserId = row.user_id;
+                                        const decryptedUserId = getDecryptedString(row.user_id);
                                         getUserName(decryptedUserId).then((name) => {
                                             const replyText = `${leftoverName}は${name}さんが持ってるだなも！`;
                                             replyMessage(event, replyText);
