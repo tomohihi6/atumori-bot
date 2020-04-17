@@ -384,7 +384,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         }
                         
                         default :
-                            tempResponse(event, replyMessage)
+                            if(event.source.groudId !== null) {
+                                tempResponse(event, replyMessage);
+                            } 
                             break;
                             
                     }
