@@ -138,8 +138,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 const text = event.message.text;
                 const leftovers = text.split(`\n`);
                 for(let i = 0; i < leftovers.length; i++) {
-                    console.log(`余り物は${leftover[i]}`);
-                    const query = `INSERT INTO leftover_tb (user_id, leftover) VALUES ('${userId}', '${leftover[i]}');`;
+                    console.log(`余り物は${leftovers[i]}`);
+                    const query = `INSERT INTO leftover_tb (user_id, leftover) VALUES ('${userId}', '${leftovers[i]}');`;
                     fetchFromDatabase(query)
                     .then((res) => {
                         console.log(res);
