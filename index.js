@@ -2,6 +2,7 @@
 
 const line = require('@line/bot-sdk');
 const express = require('express');
+const crypto = require('crypto');
 
 const { Client } = require('pg');
 
@@ -10,6 +11,32 @@ const config = {
   channelAccessToken: process.env.LINE_BOT_CHANNEL_TOKEN,
   channelSecret: process.env.LINE_BOT_CHANNEL_SECRET,
 };
+
+const ENCRYPTION_KEY = "a1KjueEUNoa1j0jaiuNjao1jkng91n1l" // 32Byte. このまま利用しないこと！
+const BUFFER_KEY = "gnJla14Nl20Ben7d" // 16Byte. このまま利用しないこと！
+const ENCRYPT_METHOD = "aes-256-cbc" // 暗号化方式
+const ENCODING = "hex" // 暗号化時のencoding
+
+function getEncryptedString(raw) {
+    let iv = Buffer.from(BUFFER_KEY)
+    let cipher = crypto.createCipheriv(ENCRYPT_METHOD, Buffer.from(ENCRYPTION_KEY), iv)
+    let encrypted = cipher.update(raw)
+  
+    encrypted = Buffer.concat([encrypted, cipher.final()])
+  
+    return encrypted.toString(ENCODING)
+}
+
+function getDecryptedString(encrypted) {
+    let iv = Buffer.from(BUFFER_KEY)
+    let encryptedText = Buffer.from(encrypted, ENCODING)
+    let decipher = crypto.createDecipheriv(ENCRYPT_METHOD, Buffer.from(ENCRYPTION_KEY), iv)
+    let decrypted = decipher.update(encryptedText)
+  
+    decrypted = Buffer.concat([decrypted, decipher.final()])
+  
+    return decrypted.toString()
+  }
 
 // create Express app
 // about Express itself: https://expressjs.com/
@@ -59,9 +86,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
         if(JSON.parse(e.postback.data).name == "updateStockPrice") {
             const stockPrice = JSON.parse(e.postback.data).stockP;
             const time = JSON.parse(e.postback.data).time;
+            const encryptedUserId = getEncryptedString(e.source.userId);
             console.log(`株価は${stockPrice}`);
             dbclient.connect();
-            dbclient.query(`UPDATE stock_price_tb SET stock_price='${stockPrice}' WHERE user_id='${e.source.userId}' AND time='${time}';`, 
+            dbclient.query(`UPDATE stock_price_tb SET stock_price='${stockPrice}' WHERE user_id='${encryptedUserId}' AND time='${time}';`, 
             (err, res) => {
                 if(err) {
                     console.log(err);
@@ -132,18 +160,18 @@ app.post('/callback', line.middleware(config), (req, res) => {
     req.body.events.forEach((event) => {
         if(waitAnswer) {
             if(event.message.text == "やっぱやめた") {
-                replyMessage(evnet, "わかっただなも");
+                replyMessage(event, "わかっただなも");
             } else {
-                const userId = event.source.userId;
+                const encryptedUserId= getEncryptedString(event.source.userId);
                 const text = event.message.text;
                 const leftovers = text.split(`\n`);
                     console.log(`余り物は${leftovers}`);
                     let values = "";
                     for(let i = 0; i < leftovers.length; i++) {
                         if(i == leftovers.length - 1) {
-                            values += `('${userId}', '${leftovers[i]}');`;
+                            values += `('${encryptedUserId}', '${leftovers[i]}');`;
                         } else {
-                            values += `('${userId}', '${leftovers[i]}'),`;
+                            values += `('${encryptedUserId}', '${leftovers[i]}'),`;
                         }
                     }
                     const query = `INSERT INTO leftover_tb (user_id, leftover) VALUES ` + values;
@@ -174,7 +202,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
                 if(numFlug) {
                     const stockPrice = event.message.text;
-                    const userId = event.source.userId;
+                    const encryptedUserId = getEncryptedString(event.source.userId);
                     const yyyymmddampm = getCurrentTime();
                     const data = yyyymmddampm.split("/");
                     let x = "";
@@ -183,7 +211,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     const displayTimeMessage = yyyymmddampm.slice(0, -1) + x;
 
                     //株価を記録するためのSQL文
-                    const query = `INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${userId}', '${stockPrice}', '${yyyymmddampm}');`;
+                    const query = `INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${encryptedUserId}', '${stockPrice}', '${yyyymmddampm}');`;
                     
                     fetchFromDatabase(query)
                     .then((res) => {
@@ -228,7 +256,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         }
 
                         case /株価一覧/.test(event.message.text): {
-                            const query = `SELECT time, stock_price FROM stock_price_tb WHERE user_id='${event.source.userId}' ORDER BY time ASC;`;
+                            const encryptedUserId = event.source.userId;
+                            const query = `SELECT time, stock_price FROM stock_price_tb WHERE user_id='${encryptedUserId}' ORDER BY time ASC;`;
                             fetchFromDatabase(query)
                             .then((res) => {
                                 let replyText = "";
@@ -254,7 +283,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             fetchFromDatabase(query)
                             .then((res) => {
                                 const maxPrice = res.rows[0].stock_price;
-                                getUserName(res.rows[0].user_id).then((name) => {
+                                const decryptedUserId = res.rows[0].user_id;
+                                getUserName(decryptedUserId).then((name) => {
                                     console.log(`名前は${name}`);
                                     replyMessage(event, `今の時間の最高値は${name}さんの${maxPrice}ベルだなも!`);  
                                 })
@@ -305,7 +335,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             .then((res) => {
                                 if(res.rowCount != 0) {
                                     res.rows.forEach((row) => {
-                                        getUserName(row.user_id).then((name) => {
+                                        const decryptedUserId = row.user_id;
+                                        getUserName(decryptedUserId).then((name) => {
                                             const replyText = `${leftoverName}は${name}さんが持ってるだなも！`;
                                             replyMessage(event, replyText);
                                         })
