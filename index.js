@@ -2,9 +2,6 @@
 
 const line = require('@line/bot-sdk');
 const express = require('express');
-const router = express.Router();
-const async = require('async');
-const db = require('./database')
 
 const { Client } = require('pg');
 
@@ -26,6 +23,9 @@ const client = new line.Client(config);
 
 //入力待ちかどうかを検出する
 let waitAnswer = false;
+
+//確認テンプレートがすでに押されているかを確認する
+let isPushConfirmTemplate = true;
 
 app.post('/callback', line.middleware(config), (req, res) => {
     const dbclient = new Client({
@@ -107,6 +107,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
     }
 
     function replyConfirmTemplate(e, param, yesData, noData) {
+        isPushConfirmTemplate = true;
         console.log(`${param}は正常に取得されています()`)
         events_processed.push(client.replyMessage(e.replyToken, {
             type: "template",
@@ -180,6 +181,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     .then((res) => {
                         replyMessage(event, `${displayTimeMessage}として株価${stockPrice}ベルを記録しただなも`);
                     }).catch((err) => {
+                        isPushConfirmTemplate = false;
                         replyConfirmTemplate(event, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, JSON.stringify({name: "updateStockPrice", stockP: stockPrice, time: yyyymmddampm}), JSON.stringify({name: "updateNo"}));
                     })
 
@@ -337,7 +339,10 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     }
                 }
             } else if(event.type == "postback") {
-                updateStockPrice(event);
+                if(!isPushConfirmTemplate) {
+                    updateStockPrice(event);
+                }
+                
             }
         }
   
