@@ -311,6 +311,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                                 .then(() => {
                                     if (event.source.groupId !== undefined) {
                                         client.leaveGroup(event.source.groupId);
+                                    } else {
+                                        console.log("グループじゃありません")
                                     }
                                 })
                             }
@@ -384,7 +386,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         }
                         
                         default :
-                            if(event.source.groudId == null) {
+                            if(event.source.groudId === undefined) {
                                 tempResponse(event, replyMessage);
                             } 
                             break;
