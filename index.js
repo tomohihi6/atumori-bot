@@ -386,7 +386,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         }
                         
                         default :
-                            if(event.source.groudId === undefined) {
+                            if(event.source.groupId === undefined) {
                                 tempResponse(event, replyMessage);
                             } 
                             break;
