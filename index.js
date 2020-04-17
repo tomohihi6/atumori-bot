@@ -36,6 +36,66 @@ app.post('/callback', line.middleware(config), (req, res) => {
     // すべてのイベント処理のプロミスを格納する配列。
     let events_processed = [];
 
+    //パターンにないメッセージが来た時にランダムに返信メッセージを決める
+    function tempResponse(e, callback) {
+        //おそらくプロフィール情報の取得に時間がかかってnameにundefindが入ることがあるので待つ
+        getUserName(e.source.userId).then((name) => {
+            console.log(`名前は${name}`);
+            const tempTexts = [
+                "会話実装めんどくさすぎてはげそうだなも!",
+                "ぼくと話す前に早く借金返せだなも！",
+                "だなも！",
+                "今回の増築代金として，1000000ベル，ローンを組ませていただくだなも！",
+                `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
+            ]
+            let random = Math.floor( Math.random() * tempTexts.length );
+            callback(e, tempTexts[random]);
+        }).catch(() => {
+            console.log("失敗しました")
+        })
+    }
+    function updateStockPrice(e) {
+        console.log(e.postback.data);
+        if(JSON.parse(e.postback.data).name == "updateStockPrice") {
+            const stockPrice = JSON.parse(e.postback.data).stockP;
+            const time = JSON.parse(e.postback.data).time;
+            console.log(`株価は${stockPrice}`);
+            dbclient.connect();
+            dbclient.query(`UPDATE stock_price_tb SET stock_price='${stockPrice}' WHERE user_id='${e.source.userId}' AND time='${time}';`, 
+            (err, res) => {
+                if(err) {
+                    console.log(err);
+                    replyMessage(e, "データの記録に失敗しただなも");
+                } else {
+                    console.log("データアップデート完了");
+                    console.log(res);
+                    dbclient.end();
+                    console.log("update client was closed");
+                    replyMessage(e, "新しい株価を記録しただなも")
+                }
+            })
+        } else if (JSON.parse(e.postback.data).name == "updateNo") {
+            replyMessage(e, "わかっただなも");
+        } 
+    }
+    function fetchFromDatabase(query) {
+        return new Promise((resolve, reject) => {
+            dbclient.connect().then((res) => {
+                dbclient.query(query, (err, res) => {
+                    if(err) {
+                        console.log(err);
+                        reject(err);
+                    } else {
+                        console.log("データベースクエリ完了");
+                        console.log(res);
+                        dbclient.end();
+                        resolve(res);
+                    }
+                })
+            })
+        })
+    }
+
     function replyMessage(e, param) {
         console.log(`${param}は正常に取得されています`);
         events_processed.push(client.replyMessage(e.replyToken, {
@@ -331,67 +391,6 @@ function getCurrentTime() {
     let ampm = (hour < 12) ? "0" : "1";
     return (year + '/' + month + '/' + day + '/' + ampm);
 }
-
-//パターンにないメッセージが来た時にランダムに返信メッセージを決める
-function tempResponse(e, callback) {
-    //おそらくプロフィール情報の取得に時間がかかってnameにundefindが入ることがあるので待つ
-    getUserName(e.source.userId).then((name) => {
-        console.log(`名前は${name}`);
-        const tempTexts = [
-            "会話実装めんどくさすぎてはげそうだなも!",
-            "ぼくと話す前に早く借金返せだなも！",
-            "だなも！",
-            "今回の増築代金として，1000000ベル，ローンを組ませていただくだなも！",
-            `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
-        ]
-        let random = Math.floor( Math.random() * tempTexts.length );
-        callback(e, tempTexts[random]);
-    }).catch(() => {
-        console.log("失敗しました")
-    })
-}
-function updateStockPrice(e) {
-    console.log(e.postback.data);
-    if(JSON.parse(e.postback.data).name == "updateStockPrice") {
-        const stockPrice = JSON.parse(e.postback.data).stockP;
-        const time = JSON.parse(e.postback.data).time;
-        console.log(`株価は${stockPrice}`);
-        dbclient.connect();
-        dbclient.query(`UPDATE stock_price_tb SET stock_price='${stockPrice}' WHERE user_id='${e.source.userId}' AND time='${time}';`, 
-        (err, res) => {
-            if(err) {
-                console.log(err);
-                replyMessage(e, "データの記録に失敗しただなも");
-            } else {
-                console.log("データアップデート完了");
-                console.log(res);
-                dbclient.end();
-                console.log("update client was closed");
-                replyMessage(e, "新しい株価を記録しただなも")
-            }
-        })
-    } else if (JSON.parse(e.postback.data).name == "updateNo") {
-        replyMessage(e, "わかっただなも");
-    } 
-}
-function fetchFromDatabase(query) {
-    return new Promise((resolve, reject) => {
-        dbclient.connect().then((res) => {
-            dbclient.query(query, (err, res) => {
-                if(err) {
-                    console.log(err);
-                    reject(err);
-                } else {
-                    console.log("データベースクエリ完了");
-                    console.log(res);
-                    dbclient.end();
-                    resolve(res);
-                }
-            })
-        })
-    })
-}
-
 
 // listen on port
 const port = process.env.PORT || 3000;
