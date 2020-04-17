@@ -137,9 +137,16 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 const userId = event.source.userId;
                 const text = event.message.text;
                 const leftovers = text.split(`\n`);
-                for(let i = 0; i < leftovers.length; i++) {
-                    console.log(`余り物は${leftovers[i]}`);
-                    const query = `INSERT INTO leftover_tb (user_id, leftover) VALUES ('${userId}', '${leftovers[i]}');`;
+                    console.log(`余り物は${leftovers}`);
+                    let values = "";
+                    for(let i = 0; i < leftovers.length; i++) {
+                        if(i == leftovers.length - 1) {
+                            values += `('${userId}', '${leftovers[i]}');`;
+                        } else {
+                            values += `('${userId}', '${leftovers[i]}'),`;
+                        }
+                    }
+                    const query = `INSERT INTO leftover_tb (user_id, leftover) VALUES ` + values;
                     fetchFromDatabase(query)
                     .then((res) => {
                         console.log(res);
@@ -148,7 +155,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         console.log(err);
                         replyMessage(event, "記録に失敗しただなも");
                     })
-                }
+
             }
             waitAnswer = false;
         } else {
