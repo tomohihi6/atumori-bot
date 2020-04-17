@@ -124,14 +124,18 @@ app.post('/callback', line.middleware(config), (req, res) => {
         })
     }
 
-    function replyMessage(e, param, callback) {
-        console.log(`${param}は正常に取得されています`);
-        events_processed.push(client.replyMessage(e.replyToken, {
-            type: "text",
-            text: param
-        }).then(() => {
-            callback();
-        }));
+    function replyMessage(e, param) {
+        return new Promise((resolve) => {
+            console.log(`${param}は正常に取得されています`);
+            events_processed.push(client.replyMessage(e.replyToken, {
+                type: "text",
+                text: param
+            })
+            .then(() => {
+                resolve();
+            }));
+        })
+
     }
 
     function replyConfirmTemplate(e, param, yesData, noData) {
@@ -303,7 +307,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
                         case /帰って/.test(event.message.text): {
                             if (event.message.text == "帰って") {
-                                replyMessage(event, "ひどいだなも", () => {
+                                replyMessage(event, "ひどいだなも")
+                                .then(() => {
                                     if (event.source.groupId !== null) {
                                         client.leaveGroup(event.source.groupId);
                                     }
