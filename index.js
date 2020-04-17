@@ -138,6 +138,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 const text = event.message.text;
                 const leftovers = text.split(`\n`);
                 leftovers.forEach((leftover) => {
+                    console.log(`余り物は${leftover}`);
                     const query = `INSERT INTO leftover_tb (user_id, leftover) VALUES ('${userId}', '${leftover}');`;
                     fetchFromDatabase(query)
                     .then((res) => {
