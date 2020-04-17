@@ -339,7 +339,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             } else if(event.type == "postback") {
                 if(!isPushConfirmTemplate) {
-                    updateStockPrice(event).then(() => isPushConfirmTemplate = true);
+                    updateStockPrice(event);
+                    isPushConfirmTemplate = true;
                 } 
             }
         }
