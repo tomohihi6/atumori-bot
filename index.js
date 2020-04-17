@@ -309,7 +309,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             if (event.message.text == "帰って") {
                                 replyMessage(event, "ひどいだなも")
                                 .then(() => {
-                                    if (event.source.groupId !== null) {
+                                    if (event.source.groupId !== undefined) {
                                         client.leaveGroup(event.source.groupId);
                                     }
                                 })
