@@ -230,14 +230,14 @@ app.post('/callback', line.middleware(config), (req, res) => {
                     //数字以外のテキストの処理    
                 } else {
                     switch (true) {
-                        case /こんにちは/.test(event.message.text):
+                        case /^こんにちは$/.test(event.message.text):
                             events_processed.push(client.replyMessage(event.replyToken, {
                                 type: "text",
                                 text: "どうもだなも!"
                             }));
                             break;
         
-                        case /今の時刻は？/.test(event.message.text): {
+                        case /^今の時刻は？$/.test(event.message.text): {
                             var date = new Date()
                             var month = date.getMonth() + 1 ;
                             var day = date.getDate() ;
@@ -253,7 +253,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             break;
                         }
         
-                        case /しずえは/.test(event.message.text): {
+                        case /^しずえは$/.test(event.message.text): {
                             events_processed.push(client.replyMessage(event.replyToken, {
                                 type: "text",
                                 text: "ノーコメントだなも"
@@ -261,7 +261,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             break;
                         }
 
-                        case /株価一覧/.test(event.message.text): {
+                        case /^株価一覧$/.test(event.message.text): {
                             const encryptedUserId = event.source.userId;
                             const query = `SELECT time, stock_price FROM stock_price_tb WHERE user_id='${encryptedUserId}' ORDER BY time ASC;`;
                             fetchFromDatabase(query)
@@ -283,7 +283,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             break;
                         }
 
-                        case /最高値/.test(event.message.text): {
+                        case /^最高値$/.test(event.message.text): {
                             const time = getCurrentTime();
                             const query = `SELECT user_id, stock_price FROM stock_price_tb WHERE time='${time}' ORDER BY stock_price DESC;`;
                             fetchFromDatabase(query)
@@ -300,12 +300,12 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             break;
                         }
 
-                        case /余り物記録/.test(event.message.text) : {
+                        case /^余り物記録$/.test(event.message.text) : {
                             replyMessage(event, "記録したい物の名前を入力して欲しいだなも");
                             waitAnswer = true;
                         }
 
-                        case /帰って/.test(event.message.text): {
+                        case /^帰って$/.test(event.message.text): {
                             if (event.message.text == "帰って") {
                                 replyMessage(event, "ひどいだなも")
                                 .then(() => {
@@ -317,7 +317,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             break;
                         } 
                         
-                        case /余り物リスト/.test(event.message.text): {
+                        case /^余り物リスト$/.test(event.message.text): {
                             const query = `SELECT leftover FROM leftover_tb;`;
                             fetchFromDatabase(query)
                             .then((res) => {
@@ -373,7 +373,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                                     const replyText = `${leftoverName}を削除しただなも`;
                                     replyMessage(event, replyText);
                                 } else {
-                                    replyMessage(event, `${leftoverName} does not exit`);
+                                    replyMessage(event, `${leftoverName} does not exist`);
                                 }
  
                             }).catch((err) => {
