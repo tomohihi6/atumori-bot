@@ -107,7 +107,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
     }
 
     function replyConfirmTemplate(e, param, yesData, noData) {
-        isPushConfirmTemplate = true;
         console.log(`${param}は正常に取得されています()`)
         events_processed.push(client.replyMessage(e.replyToken, {
             type: "template",
@@ -320,7 +319,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             .then((res) => {
                                 if(res.rowCount != 0) {
                                     const replyText = `${leftoverName}を削除しただなも`;
-                                    replyMessage(event, `${leftoverName}を削除しただなも`);
+                                    replyMessage(event, replyText);
                                 } else {
                                     replyMessage(event, `${leftoverName} does not exit`);
                                 }
@@ -340,9 +339,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             } else if(event.type == "postback") {
                 if(!isPushConfirmTemplate) {
-                    updateStockPrice(event);
-                }
-                
+                    updateStockPrice(event).then(() => isPushConfirmTemplate = true);
+                } 
             }
         }
   
