@@ -12,6 +12,7 @@ const config = {
   channelSecret: process.env.LINE_BOT_CHANNEL_SECRET,
 };
 
+//こいつ隠したいけどどうすればいいかわからん
 const ENCRYPTION_KEY = "a1KjueEUNoa1j0jaiuNjao1jkng91n1l" // 32Byte. このまま利用しないこと！
 const BUFFER_KEY = "gnJla14Nl20Ben7d" // 16Byte. このまま利用しないこと！
 const ENCRYPT_METHOD = "aes-256-cbc" // 暗号化方式
