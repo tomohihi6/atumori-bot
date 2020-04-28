@@ -262,7 +262,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         }
 
                         case /^株価一覧$/.test(event.message.text): {
-                            const encryptedUserId = event.source.userId;
+                            const encryptedUserId = getEncryptedString(event.source.userId); 
+                            console.log(encryptedUserId);
                             const query = `SELECT time, stock_price FROM stock_price_tb WHERE user_id='${encryptedUserId}' ORDER BY time ASC;`;
                             fetchFromDatabase(query)
                             .then((res) => {
