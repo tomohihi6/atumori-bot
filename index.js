@@ -160,7 +160,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             replyMessage(event, "記録したい物の名前を入力して欲しいだなも");
                             isRecord = {
                                 waitAnswer = true,
-                                userId = event.source.userId;
+                                userId = event.source.userId,
                             }
                         }
                         case /^帰って$/.test(event.message.text): {
