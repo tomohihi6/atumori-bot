@@ -51,6 +51,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
         if(isRecord.waitAnswer) {
             if(isRecord.userId == event.source.userId) {
                 recordLeftover(event);
+                isRecord.waitAnswer = false;
+                isRecord.userId = "";
             }
         }else {
             // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
