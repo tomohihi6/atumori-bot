@@ -3,7 +3,6 @@
 const line = require('@line/bot-sdk');
 const express = require('express');
 const crypto = require('crypto');
-
 const { Client } = require('pg');
 
 // create LINE SDK config from env variables
@@ -17,27 +16,6 @@ const ENCRYPTION_KEY = "a1KjueEUNoa1j0jaiuNjao1jkng91n1l" // 32Byte. このま�
 const BUFFER_KEY = "gnJla14Nl20Ben7d" // 16Byte. このまま利用しないこと！
 const ENCRYPT_METHOD = "aes-256-cbc" // 暗号化方式
 const ENCODING = "hex" // 暗号化時のencoding
-
-function getEncryptedString(raw) {
-    let iv = Buffer.from(BUFFER_KEY)
-    let cipher = crypto.createCipheriv(ENCRYPT_METHOD, Buffer.from(ENCRYPTION_KEY), iv)
-    let encrypted = cipher.update(raw)
-  
-    encrypted = Buffer.concat([encrypted, cipher.final()])
-  
-    return encrypted.toString(ENCODING)
-}
-
-function getDecryptedString(encrypted) {
-    let iv = Buffer.from(BUFFER_KEY)
-    let encryptedText = Buffer.from(encrypted, ENCODING)
-    let decipher = crypto.createDecipheriv(ENCRYPT_METHOD, Buffer.from(ENCRYPTION_KEY), iv)
-    let decrypted = decipher.update(encryptedText)
-  
-    decrypted = Buffer.concat([decrypted, decipher.final()])
-  
-    return decrypted.toString()
-  }
 
 // create Express app
 // about Express itself: https://expressjs.com/
@@ -59,71 +37,11 @@ app.post('/callback', line.middleware(config), (req, res) => {
     const dbclient = new Client({
         connectionString: process.env.DATABASE_URL,
       });
+    
     res.sendStatus(200);
 
     // すべてのイベント処理のプロミスを格納する配列。
     let events_processed = [];
-
-    //パターンにないメッセージが来た時にランダムに返信メッセージを決める
-    function tempResponse(e, callback) {
-        //おそらくプロフィール情報の取得に時間がかかってnameにundefindが入ることがあるので待つ
-        getUserName(e.source.userId).then((name) => {
-            console.log(`名前は${name}`);
-            const tempTexts = [
-                "会話実装めんどくさすぎてはげそうだなも!",
-                "ぼくと話す前に早く借金返せだなも！",
-                "だなも！",
-                "今回の増築代金として，1000000ベル，ローンを組ませていただくだなも！",
-                `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
-            ]
-            let random = Math.floor( Math.random() * tempTexts.length );
-            callback(e, tempTexts[random]);
-        }).catch(() => {
-            console.log("失敗しました")
-        })
-    }
-    function updateStockPrice(e) {
-        console.log(e.postback.data);
-        if(JSON.parse(e.postback.data).name == "updateStockPrice") {
-            const stockPrice = JSON.parse(e.postback.data).stockP;
-            const time = JSON.parse(e.postback.data).time;
-            const encryptedUserId = getEncryptedString(e.source.userId);
-            console.log(`株価は${stockPrice}`);
-            dbclient.connect();
-            dbclient.query(`UPDATE stock_price_tb SET stock_price='${stockPrice}' WHERE user_id='${encryptedUserId}' AND time='${time}';`, 
-            (err, res) => {
-                if(err) {
-                    console.log(err);
-                    replyMessage(e, "データの記録に失敗しただなも");
-                } else {
-                    console.log("データアップデート完了");
-                    console.log(res);
-                    dbclient.end();
-                    console.log("update client was closed");
-                    replyMessage(e, "新しい株価を記録しただなも")
-                }
-            })
-        } else if (JSON.parse(e.postback.data).name == "updateNo") {
-            replyMessage(e, "わかっただなも");
-        } 
-    }
-    function fetchFromDatabase(query) {
-        return new Promise((resolve, reject) => {
-            dbclient.connect().then((res) => {
-                dbclient.query(query, (err, res) => {
-                    if(err) {
-                        console.log(err);
-                        reject(err);
-                    } else {
-                        console.log("データベースクエリ完了");
-                        console.log(res);
-                        dbclient.end();
-                        resolve(res);
-                    }
-                })
-            })
-        })
-    }
 
     function replyMessage(e, param) {
         return new Promise((resolve) => {
@@ -417,16 +335,17 @@ app.post('/callback', line.middleware(config), (req, res) => {
             );
 });
 
-function getUserName(userID) {
-    return new Promise(function(resolve, reject) {
-        const userId = userID;
-        client.getProfile(userId)
-        .then((profile) => {
-            resolve(profile.displayName)
-        }).catch((err) => {
-            reject(err);
-        })
-    })
+// listen on port
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`listening on ${port}`);
+});
+
+
+async function getUserName(userID) {
+    const userId = userID;
+    const profile = await client.getProfile(userId)
+    return profile.displayName;
 }
 
 function getCurrentTime() {
@@ -449,8 +368,83 @@ function getCurrentTime() {
     return (year + '/' + month + '/' + day + '/' + ampm);
 }
 
-// listen on port
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`listening on ${port}`);
-});
+function getEncryptedString(raw) {
+    let iv = Buffer.from(BUFFER_KEY)
+    let cipher = crypto.createCipheriv(ENCRYPT_METHOD, Buffer.from(ENCRYPTION_KEY), iv)
+    let encrypted = cipher.update(raw)
+  
+    encrypted = Buffer.concat([encrypted, cipher.final()])
+  
+    return encrypted.toString(ENCODING)
+}
+
+function getDecryptedString(encrypted) {
+    let iv = Buffer.from(BUFFER_KEY)
+    let encryptedText = Buffer.from(encrypted, ENCODING)
+    let decipher = crypto.createDecipheriv(ENCRYPT_METHOD, Buffer.from(ENCRYPTION_KEY), iv)
+    let decrypted = decipher.update(encryptedText)
+  
+    decrypted = Buffer.concat([decrypted, decipher.final()])
+  
+    return decrypted.toString()
+  }
+
+  //パターンにないメッセージが来た時にランダムに返信メッセージを決める
+  async function tempResponse(e, callback) {
+    //おそらくプロフィール情報の取得に時間がかかってnameにundefindが入ることがあるので待つ
+    const name = await getUserName(e.source.userId)
+    console.log(`名前は${name}`);
+    const tempTexts = [
+        "会話実装めんどくさすぎてはげそうだなも!",
+        "ぼくと話す前に早く借金返せだなも！",
+        "だなも！",
+        "今回の増築代金として，1000000ベル，ローンを組ませていただくだなも！",
+        `ぼくに騙されて${name}さんが無人島ツアーに申し込んでくれたおかげで，人生勝ち組だなも`
+    ]
+    let random = Math.floor( Math.random() * tempTexts.length );
+    callback(e, tempTexts[random]);
+}
+
+function updateStockPrice(e) {
+    console.log(e.postback.data);
+    if(JSON.parse(e.postback.data).name == "updateStockPrice") {
+        const stockPrice = JSON.parse(e.postback.data).stockP;
+        const time = JSON.parse(e.postback.data).time;
+        const encryptedUserId = getEncryptedString(e.source.userId);
+        console.log(`株価は${stockPrice}`);
+        dbclient.connect();
+        dbclient.query(`UPDATE stock_price_tb SET stock_price='${stockPrice}' WHERE user_id='${encryptedUserId}' AND time='${time}';`, 
+        (err, res) => {
+            if(err) {
+                console.log(err);
+                replyMessage(e, "データの記録に失敗しただなも");
+            } else {
+                console.log("データアップデート完了");
+                console.log(res);
+                dbclient.end();
+                console.log("update client was closed");
+                replyMessage(e, "新しい株価を記録しただなも")
+            }
+        })
+    } else if (JSON.parse(e.postback.data).name == "updateNo") {
+        replyMessage(e, "わかっただなも");
+    } 
+}
+
+function fetchFromDatabase(query) {
+    return new Promise((resolve, reject) => {
+        dbclient.connect().then((res) => {
+            dbclient.query(query, (err, res) => {
+                if(err) {
+                    console.log(err);
+                    reject(err);
+                } else {
+                    console.log("データベースクエリ完了");
+                    console.log(res);
+                    dbclient.end();
+                    resolve(res);
+                }
+            })
+        })
+    })
+}
