@@ -41,7 +41,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
     
     res.sendStatus(200);
 
-    events_processed  = {};
+    events_processed  = [];
 
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
@@ -261,11 +261,11 @@ app.post('/callback', line.middleware(config), (req, res) => {
         console.log(req.body.events[0].source)
     });
             // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
-            Promise.all(events_processed).then(
-                (response) => {
-                    console.log(`${response.length} event(s) processed.`);
-                }
-            );
+    Promise.all(events_processed).then(
+        (response) => {
+            console.log(`${response.length} event(s) processed.`);
+        }
+    );
 });
 
 // listen on port
@@ -416,7 +416,7 @@ async function recordLeftover(e) {
                 }
             }
             const query = `INSERT INTO leftover_tb (user_id, leftover) VALUES ` + values;
-            const res = await fetchFromDatabase(query).catch(() => {
+            await fetchFromDatabase(query).catch((err) => {
                 console.log(err);
                 replyMessage(e, "記録に失敗しただなも");
             })
