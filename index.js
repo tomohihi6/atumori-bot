@@ -42,45 +42,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
     res.sendStatus(200);
 
     // すべてのイベント処理のプロミスを格納する配列。
-    let events_processed = [];
-
-    function replyMessage(e, param) {
-        return new Promise((resolve) => {
-            console.log(`${param}は正常に取得されています`);
-            events_processed.push(client.replyMessage(e.replyToken, {
-                type: "text",
-                text: param
-            })
-            .then(() => {
-                resolve();
-            }));
-        })
-
-    }
-
-    function replyConfirmTemplate(e, param, yesData, noData) {
-        console.log(`${param}は正常に取得されています()`)
-        events_processed.push(client.replyMessage(e.replyToken, {
-            type: "template",
-            altText: "うんち",
-            template: {
-                type: "confirm",
-                text: param,
-                actions: [
-                    {
-                        type: "postback",
-                        label: "はい",
-                        data: yesData
-                    },
-                    {
-                        type: "postback",
-                        label: "いいえ",
-                        data: noData,
-                    }
-                ],
-            }
-        }))
-    }
+    events_processed = [];
 
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
@@ -318,6 +280,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 if(!isPushConfirmTemplate) {
                     if(JSON.parse(event.postback.data).name == "updateStockPrice") {
                         updateStockPrice(event);
+                        replyMessage(event, "")
                         isPushConfirmTemplate = true;
                     } else {
                         replyMessage(event, "わかっただなも");
@@ -394,8 +357,45 @@ function getDecryptedString(encrypted) {
     return decrypted.toString()
   }
 
-  //パターンにないメッセージが来た時にランダムに返信メッセージを決める
-  async function tempResponse(e, callback) {
+  function replyMessage(e, param) {
+    return new Promise((resolve) => {
+        console.log(`${param}は正常に取得されています`);
+        events_processed.push(client.replyMessage(e.replyToken, {
+            type: "text",
+            text: param
+        })
+        .then(() => {
+            resolve();
+        }));
+    })
+}
+
+function replyConfirmTemplate(e, param, yesData, noData) {
+    console.log(`${param}は正常に取得されています()`)
+    events_processed.push(client.replyMessage(e.replyToken, {
+        type: "template",
+        altText: "うんち",
+        template: {
+            type: "confirm",
+            text: param,
+            actions: [
+                {
+                    type: "postback",
+                    label: "はい",
+                    data: yesData
+                },
+                {
+                    type: "postback",
+                    label: "いいえ",
+                    data: noData,
+                }
+            ],
+        }
+    }))
+}
+
+//パターンにないメッセージが来た時にランダムに返信メッセージを決める
+async function tempResponse(e, callback) {
     //おそらくプロフィール情報の取得に時間がかかってnameにundefindが入ることがあるので待つ
     const name = await getUserName(e.source.userId)
     console.log(`名前は${name}`);
