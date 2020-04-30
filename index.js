@@ -41,7 +41,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
     
     res.sendStatus(200);
 
-    events_processed  = {};
+    events_processed  = [];
 
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
