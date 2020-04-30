@@ -316,8 +316,12 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 }
             } else if(event.type == "postback") {
                 if(!isPushConfirmTemplate) {
-                    updateStockPrice(event);
-                    isPushConfirmTemplate = true;
+                    if(JSON.parse(event.postback.data).name == "updateStockPrice") {
+                        updateStockPrice(event);
+                        isPushConfirmTemplate = true;
+                    } else {
+                        replyMessage(event, "わかっただなも");
+                    }
                 } 
             } else if(event.type == "join") {
                 const groupId = event.source.groupId;
@@ -406,46 +410,27 @@ function getDecryptedString(encrypted) {
     callback(e, tempTexts[random]);
 }
 
-function updateStockPrice(e) {
-    console.log(e.postback.data);
-    if(JSON.parse(e.postback.data).name == "updateStockPrice") {
-        const stockPrice = JSON.parse(e.postback.data).stockP;
-        const time = JSON.parse(e.postback.data).time;
-        const encryptedUserId = getEncryptedString(e.source.userId);
-        console.log(`株価は${stockPrice}`);
-        dbclient.connect();
-        dbclient.query(`UPDATE stock_price_tb SET stock_price='${stockPrice}' WHERE user_id='${encryptedUserId}' AND time='${time}';`, 
-        (err, res) => {
-            if(err) {
-                console.log(err);
-                replyMessage(e, "データの記録に失敗しただなも");
-            } else {
-                console.log("データアップデート完了");
-                console.log(res);
-                dbclient.end();
-                console.log("update client was closed");
-                replyMessage(e, "新しい株価を記録しただなも")
-            }
+async function fetchFromDatabase(query) {
+        await dbclient.connect();
+        const res = await dbclient.query(query).catch(() => {
+            console.error(err);
         })
-    } else if (JSON.parse(e.postback.data).name == "updateNo") {
-        replyMessage(e, "わかっただなも");
-    } 
+        console.log("データベースクエリ完了");
+        console.log(res);
+        await dbclient.end();
+        return res;
 }
 
-function fetchFromDatabase(query) {
-    return new Promise((resolve, reject) => {
-        dbclient.connect().then((res) => {
-            dbclient.query(query, (err, res) => {
-                if(err) {
-                    console.log(err);
-                    reject(err);
-                } else {
-                    console.log("データベースクエリ完了");
-                    console.log(res);
-                    dbclient.end();
-                    resolve(res);
-                }
-            })
-        })
+async function updateStockPrice(e) {
+    const stockPrice = JSON.parse(e.postback.data).stockP;
+    const time = JSON.parse(e.postback.data).time;
+    const encryptedUserId = getEncryptedString(e.source.userId);
+    const query = `UPDATE stock_price_tb SET stock_price='${stockPrice}' WHERE user_id='${encryptedUserId}' AND time='${time}';`;
+    await fetchFromDatabase(query).catch(() => {
+        console.log(err);
+        replyMessage(e, "データの記録に失敗しただなも");
     })
+    console.log("データアップデート完了");
+    console.log("update client was closed");
+    replyMessage(e, "新しい株価を記録しただなも")
 }
