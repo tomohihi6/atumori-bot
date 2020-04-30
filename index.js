@@ -25,8 +25,8 @@ const app = express();
 const client = new line.Client(config);
 let dbclient = {}
 
-// register a webhook handler with middleware
-// about the middleware, please refer to doc
+// すべてのイベント処理のプロミスを格納する配列。
+let events_processed = [];
 
 //入力待ちかどうかを検出する
 let waitAnswer = false;
@@ -41,8 +41,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
     
     res.sendStatus(200);
 
-    // すべてのイベント処理のプロミスを格納する配列。
-    events_processed = [];
+    events_processed  = {};
 
     // イベントオブジェクトを順次処理。
     req.body.events.forEach((event) => {
