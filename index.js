@@ -23,7 +23,7 @@ const app = express();
 
 // APIコールのためのクライアントインスタンスを作成
 const client = new line.Client(config);
-const dbclient;
+let dbclient = {}
 
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
