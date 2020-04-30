@@ -34,7 +34,7 @@ let waitAnswer = false;
 let isPushConfirmTemplate = true;
 
 app.post('/callback', line.middleware(config), (req, res) => {
-    const dbclient = new Client({
+    dbclient = new Client({
         connectionString: process.env.DATABASE_URL,
       });
     
