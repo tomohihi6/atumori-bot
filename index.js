@@ -343,7 +343,7 @@ async function fetchFromDatabase(query) {
     return new Promise(async (resolve, reject) => {
         await dbclient.connect();
         const res = await dbclient.query(query).catch((err) => {
-            await dbclient.end();
+            dbclient.end();
             reject(err);
             return;
         })
