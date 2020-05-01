@@ -57,7 +57,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
             // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
             if (event.type == "message" && event.message.type == "text"){
                 //数字だけのテキストかどうかを判定
-                let numFlug = isInteger(event);
+                let numFlag = isInteger(event);
 
                 if(numFlug) {
                     recordStockPrice(event);
@@ -396,7 +396,7 @@ function isInteger(e) {
         //1文字ずつアスキーコードを比較して数字判定
         let charCode = e.message.text.charCodeAt(i);
         if(charCode < 48  || charCode > 57){
-            numFlug = false;
+            numFlag = false;
             //１つでも数字以外の文字が見つかった場合for文終わり
             break;
         }
