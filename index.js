@@ -57,10 +57,9 @@ app.post('/callback', line.middleware(config), (req, res) => {
             // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
             if (event.type == "message" && event.message.type == "text"){
                 //数字だけのテキストかどうかを判定
-                let isInteger = isInteger(event);
+                let numFlag = isInteger(event);
                 if(numFlag) {
                     recordStockPrice(event);
-
                 } else {
                     switch (true) {
                         case /^こんにちは$/.test(event.message.text):
@@ -390,17 +389,17 @@ async function recordLeftover(e) {
 }
 
 function isInteger(e) {
-    let isInteger = true;
+    let numFlag = true;
     for(let i = 0; i < e.message.text.length; i++) {
         //1文字ずつアスキーコードを比較して数字判定
         let charCode = e.message.text.charCodeAt(i);
         if(charCode < 48  || charCode > 57){
-            isInteger = false;
+            numFlag = false;
             //１つでも数字以外の文字が見つかった場合for文終わり
             break;
         }
     }
-    return isInteger;
+    return numFlag;
 }
 
 async function recordStockPrice(e) {
