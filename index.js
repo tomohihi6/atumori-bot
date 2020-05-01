@@ -340,18 +340,15 @@ async function tempResponse(e, callback) {
 }
 
 async function fetchFromDatabase(query) {
-    return new Promise(async (resolve, reject) => {
-        await dbclient.connect();
-        const res = await dbclient.query(query).catch((err) => {
-            dbclient.end();
-            reject(err);
-            return;
-        })
-        console.log("データベースクエリ完了");
-        console.log(res.body);
+    await dbclient.connect();
+    const res = await dbclient.query(query).catch(async (err) => {
         await dbclient.end();
-        resolve(res);
+        return Promise.reject(new Error(err))
     })
+    console.log("データベースクエリ完了");
+    console.log(res);
+    await dbclient.end();
+    return res;
 
 }
 
