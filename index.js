@@ -414,8 +414,8 @@ async function recordStockPrice(e) {
     //株価を記録するためのSQL文
     const query = `INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${encryptedUserId}', '${stockPrice}', '${yyyymmddampm}');`;
 
-    await fetchFromDatabase(query).catch((err) => {
-        console.log(`株価格納エラー${err}`);
+    await fetchFromDatabase(query).catch(err => {
+        console.log(`株価格納エラー\n${err.message}`);
         isPushConfirmTemplate = false;
         replyConfirmTemplate(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, JSON.stringify({name: "updateStockPrice", stockP: stockPrice, time: yyyymmddampm}), JSON.stringify({name: "updateNo"}));
     })
