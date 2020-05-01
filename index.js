@@ -59,7 +59,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 //数字だけのテキストかどうかを判定
                 let numFlag = isInteger(event);
 
-                if(numFlug) {
+                if(numFlag) {
                     recordStockPrice(event);
 
                 } else {
