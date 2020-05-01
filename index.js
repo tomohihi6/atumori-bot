@@ -343,10 +343,12 @@ async function fetchFromDatabase(query) {
     return new Promise(async (resolve, reject) => {
         await dbclient.connect();
         const res = await dbclient.query(query).catch((err) => {
+            await dbclient.end();
             reject(err);
+            return;
         })
         console.log("データベースクエリ完了");
-        console.log(res);
+        console.log(res.body);
         await dbclient.end();
         resolve(res);
     })
