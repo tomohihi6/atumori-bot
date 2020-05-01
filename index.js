@@ -77,41 +77,11 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             break;
                         }
                         case /^株価一覧$/.test(event.message.text): {
-                            const encryptedUserId = getEncryptedString(event.source.userId); 
-                            console.log(encryptedUserId);
-                            const query = `SELECT time, stock_price FROM stock_price_tb WHERE user_id='${encryptedUserId}' ORDER BY time ASC;`;
-                            fetchFromDatabase(query)
-                            .then((res) => {
-                                let replyText = "";
-                                res.rows.forEach((row) => {
-                                    let time = row.time;
-                                    let data = time.split("/")
-                                    if (data[3] == "0") {
-                                        replyText += `${data[1]}月${data[2]}日午前の株価:${row.stock_price}ベル\n`
-                                    } else if(data[3] == "1") {
-                                        replyText += `${data[1]}月${data[2]}日午後の株価:${row.stock_price}ベル\n`
-                                    }
-                                })
-                                replyMessage(event, replyText)
-                            }).catch((err) => {
-                                replyMessage(event, "株価取得に失敗しただなも");
-                            })
+                            stockPriceList(event);
                             break;
                         }
                         case /^最高値$/.test(event.message.text): {
-                            const time = getCurrentTime();
-                            const query = `SELECT user_id, stock_price FROM stock_price_tb WHERE time='${time}' ORDER BY stock_price DESC;`;
-                            fetchFromDatabase(query)
-                            .then((res) => {
-                                const maxPrice = res.rows[0].stock_price;
-                                const decryptedUserId = getDecryptedString(res.rows[0].user_id);
-                                getUserName(decryptedUserId).then((name) => {
-                                    console.log(`名前は${name}`);
-                                    replyMessage(event, `今の時間の最高値は${name}さんの${maxPrice}ベルだなも!`);  
-                                })
-                            }).catch((err) => {
-                                replyMessage(event, "株価最高値の取得に失敗しただなも");
-                            })
+                            whoIsMaxPriceHolder(event);
                             break;
                         }
                         case /^余り物記録$/.test(event.message.text) : {
@@ -134,66 +104,15 @@ app.post('/callback', line.middleware(config), (req, res) => {
                         } 
 
                         case /^余り物リスト$/.test(event.message.text): {
-                            const query = `SELECT leftover FROM leftover_tb;`;
-                            fetchFromDatabase(query)
-                            .then((res) => {
-                                if(res.rowCount != 0) {
-                                    let replyText = "";
-                                    for(let i = 0; i < res.rows.length; i++) {
-                                        replyText += `${res.rows[i].leftover}`
-                                        if(i !== res.rows.length - 1)　{
-                                            replyText += `\n`;
-                                        }                                    
-                                    }
-                                    replyMessage(event, replyText);
-                                } else {
-                                    replyMessage(event, "そんなもんねえよ");
-                                }
-                            }).catch((err) => {
-                                console.log(err);
-                                replyMessage(event, "余り物リスト取得に失敗しただなも");
-                            })
+                            leftoverList(event);
                             break;
                         }
                         case /.*欲しい/.test(event.message.text): {
-                            const leftoverName = event.message.text.replace("欲しい", "");
-                            const query = `SELECT user_id FROM leftover_tb WHERE leftover='${leftoverName}';`;
-                            fetchFromDatabase(query)
-                            .then((res) => {
-                                if(res.rowCount != 0) {
-                                    res.rows.forEach((row) => {
-                                        const decryptedUserId = getDecryptedString(row.user_id);
-                                        getUserName(decryptedUserId).then((name) => {
-                                            const replyText = `${leftoverName}は${name}さんが持ってるだなも！`;
-                                            replyMessage(event, replyText);
-                                        })
-                                    })
-                                } else {
-                                    replyMessage(event, `${leftoverName} does not exist`);
-                                }
-
-                            }).catch((err) => {
-                                console.log(err);
-                                replyMessage(event, "存在しねえよ");
-                            })
+                            getWishLeftover(event);
                             break;
                         }
                         case /.*削除/.test(event.message.text): {
-                            const leftoverName = event.message.text.replace("削除", "");
-                            const query = `DELETE FROM leftover_tb WHERE leftover='${leftoverName}';`;
-                            fetchFromDatabase(query)
-                            .then((res) => {
-                                if(res.rowCount != 0) {
-                                    const replyText = `${leftoverName}を削除しただなも`;
-                                    replyMessage(event, replyText);
-                                } else {
-                                    replyMessage(event, `${leftoverName} does not exist`);
-                                }
-
-                            }).catch((err) => {
-                                console.log(err);
-                                replyMessage(event, "存在しねえよ");
-                            })
+                            deleteLeftover(e);
                             break;
                         }
 
@@ -426,4 +345,104 @@ async function recordStockPrice(e) {
         return 
     })
 
+}
+
+async function stockPriceList(e) {
+    const encryptedUserId = getEncryptedString(e.source.userId); 
+    const query = `SELECT time, stock_price FROM stock_price_tb WHERE user_id='${encryptedUserId}' ORDER BY time ASC;`;
+    fetchFromDatabase(query)
+    .then((res) => {
+        let replyText = "";
+        res.rows.forEach((row) => {
+            let time = row.time;
+            let data = time.split("/")
+            if (data[3] == "0") {
+                replyText += `${data[1]}月${data[2]}日午前の株価:${row.stock_price}ベル\n`
+            } else if(data[3] == "1") {
+                replyText += `${data[1]}月${data[2]}日午後の株価:${row.stock_price}ベル\n`
+            }
+        })
+        replyMessage(e, replyText)
+    }).catch((err) => {
+        replyMessage(e, "株価取得に失敗しただなも");
+    })
+}
+
+async function whoIsMaxPriceHolder(e) {
+    const time = getCurrentTime();
+    const query = `SELECT user_id, stock_price FROM stock_price_tb WHERE time='${time}' ORDER BY stock_price DESC;`;
+    fetchFromDatabase(query)
+    .then((res) => {
+        const maxPrice = res.rows[0].stock_price;
+        const decryptedUserId = getDecryptedString(res.rows[0].user_id);
+        getUserName(decryptedUserId).then((name) => {
+            console.log(`名前は${name}`);
+            replyMessage(e, `今の時間の最高値は${name}さんの${maxPrice}ベルだなも!`);
+        })
+    }).catch((err) => {
+        replyMessage(e, "株価最高値の取得に失敗しただなも");
+    })
+}
+
+async function leftoverList(e) {
+    const query = `SELECT leftover FROM leftover_tb;`;
+    fetchFromDatabase(query)
+    .then((res) => {
+        if(res.rowCount != 0) {
+            let replyText = "";
+            for(let i = 0; i < res.rows.length; i++) {
+                replyText += `${res.rows[i].leftover}`
+                if(i !== res.rows.length - 1)　{
+                    replyText += `\n`;
+                }                                    
+            }
+            replyMessage(e, replyText);
+        } else {
+            replyMessage(e, "そんなもんねえよ");
+        }
+    }).catch((err) => {
+        console.log(err)
+        replyMessage(e, "余り物リスト取得に失敗しただなも");
+    })
+}
+
+async function getWishLeftover(e) {
+    const leftoverName = e.message.text.replace("欲しい", "");
+    const query = `SELECT user_id FROM leftover_tb WHERE leftover='${leftoverName}';`;
+    fetchFromDatabase(query)
+    .then((res) => {
+        if(res.rowCount != 0) {
+            res.rows.forEach((row) => {
+                const decryptedUserId = getDecryptedString(row.user_id);
+                getUserName(decryptedUserId).then((name) => {
+                    const replyText = `${leftoverName}は${name}さんが持ってるだなも！`;
+                    replyMessage(e, replyText);
+                })
+            })
+        } else {
+            replyMessage(e, `${leftoverName} does not exist`);
+        }
+
+    }).catch((err) => {
+        console.log(err);
+        replyMessage(e, "存在しねえよ");
+    })
+}
+
+async function deleteLeftover(e) {
+    const leftoverName = e.message.text.replace("削除", "");
+    const query = `DELETE FROM leftover_tb WHERE leftover='${leftoverName}';`;
+    fetchFromDatabase(query)
+    .then((res) => {
+        if(res.rowCount != 0) {
+            const replyText = `${leftoverName}を削除しただなも`;
+            replyMessage(e, replyText);
+        } else {
+            replyMessage(e, `${leftoverName} does not exist`);
+        }
+
+    }).catch((err) => {
+        console.log(err);
+        replyMessage(e, "存在しねえよ");
+    })
 }
