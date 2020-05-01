@@ -386,6 +386,7 @@ async function recordLeftover(e) {
             const res = await fetchFromDatabase(query).catch(() => {
                 console.log(err);
                 replyMessage(e, "記録に失敗しただなも");
+                return;
             })
             replyMessage(e, "記録しただなも");
         }
@@ -421,6 +422,7 @@ async function recordStockPrice(e) {
         console.log(err);
         isPushConfirmTemplate = false;
         replyConfirmTemplate(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, JSON.stringify({name: "updateStockPrice", stockP: stockPrice, time: yyyymmddampm}), JSON.stringify({name: "updateNo"}));
+        return;
     })
     replyMessage(e, `${displayTimeMessage}として株価${stockPrice}ベルを記録しただなも`);
 }
