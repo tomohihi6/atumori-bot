@@ -340,15 +340,17 @@ async function tempResponse(e, callback) {
 }
 
 async function fetchFromDatabase(query) {
+    return new Promise((resolve, reject) => {
         await dbclient.connect();
         const res = await dbclient.query(query).catch((err) => {
-            console.error(err);
-            return err
+            return reject(err);
         })
         console.log("データベースクエリ完了");
         console.log(res);
         await dbclient.end();
-        return res;
+        resolve(res);
+    })
+
 }
 
 async function updateStockPrice(e) {
