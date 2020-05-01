@@ -11,9 +11,8 @@ const config = {
   channelSecret: process.env.LINE_BOT_CHANNEL_SECRET,
 };
 
-//こいつ隠したいけどどうすればいいかわからん
-const ENCRYPTION_KEY = "a1KjueEUNoa1j0jaiuNjao1jkng91n1l" // 32Byte. このまま利用しないこと！
-const BUFFER_KEY = "gnJla14Nl20Ben7d" // 16Byte. このまま利用しないこと！
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY
+const BUFFER_KEY = process.env.BUFFER_KEY
 const ENCRYPT_METHOD = "aes-256-cbc" // 暗号化方式
 const ENCODING = "hex" // 暗号化時のencoding
 
@@ -58,36 +57,11 @@ app.post('/callback', line.middleware(config), (req, res) => {
             // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
             if (event.type == "message" && event.message.type == "text"){
                 //数字だけのテキストかどうかを判定
-                let numFlug = true;
-                for(let i = 0; i < event.message.text.length; i++) {
-                    //1文字ずつアスキーコードを比較して数字判定
-                    let charCode = event.message.text.charCodeAt(i);
-                    if(charCode < 48  || charCode > 57){
-                        numFlug = false;
-                        //１つでも数字以外の文字が見つかった場合for文終わり
-                        break;
-                    }
-                }
-                if(numFlug) {
-                    const stockPrice = event.message.text;
-                    const encryptedUserId = getEncryptedString(event.source.userId);
-                    const yyyymmddampm = getCurrentTime();
-                    const data = yyyymmddampm.split("/");
-                    let x = "";
-                    if (data[3] == "0") x = "午前"
-                    else if(data[3] == "1") x = "午後"
-                    const displayTimeMessage = yyyymmddampm.slice(0, -1) + x;
-                    //株価を記録するためのSQL文
-                    const query = `INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${encryptedUserId}', '${stockPrice}', '${yyyymmddampm}');`;
+                let numFlug = isInteger(event);
 
-                    fetchFromDatabase(query)
-                    .then((res) => {
-                        replyMessage(event, `${displayTimeMessage}として株価${stockPrice}ベルを記録しただなも`);
-                    }).catch((err) => {
-                        isPushConfirmTemplate = false;
-                        replyConfirmTemplate(event, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, JSON.stringify({name: "updateStockPrice", stockP: stockPrice, time: yyyymmddampm}), JSON.stringify({name: "updateNo"}));
-                    })
-                    //数字以外のテキストの処理    
+                if(numFlug) {
+                    recordStockPrice(event);
+
                 } else {
                     switch (true) {
                         case /^こんにちは$/.test(event.message.text):
@@ -96,22 +70,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
                                 text: "どうもだなも!"
                             }));
                             break;
-                        
-                        case /^今の時刻は？$/.test(event.message.text): {
-                            var date = new Date()
-                            var month = date.getMonth() + 1 ;
-                            var day = date.getDate() ;
-                            var hour = date.getHours() ;
-                            var minute = date.getMinutes() ;
-                            var dayOfWeek = date.getDay();
-                            var dayOfWeekStr = [ "日", "月", "火", "水", "木", "金", "土" ][dayOfWeek] ;
-                            const time = `今は${month}月${day}日の${dayOfWeekStr}曜日${hour}時${minute}分だなも`
-                            events_processed.push(client.replyMessage(event.replyToken, {
-                                type: "text",
-                                text: time
-                            }))
-                            break;
-                        }
                     
                         case /^しずえは$/.test(event.message.text): {
                             events_processed.push(client.replyMessage(event.replyToken, {
@@ -330,7 +288,7 @@ function getDecryptedString(encrypted) {
     return decrypted.toString()
   }
 
-  function replyMessage(e, param) {
+function replyMessage(e, param) {
     return new Promise((resolve) => {
         console.log(`${param}は正常に取得されています`);
         events_processed.push(client.replyMessage(e.replyToken, {
@@ -430,4 +388,38 @@ async function recordLeftover(e) {
             })
             replyMessage(e, "記録しただなも");
         }
+}
+
+function isInteger(e) {
+    let numFlag = true;
+    for(let i = 0; i < e.message.text.length; i++) {
+        //1文字ずつアスキーコードを比較して数字判定
+        let charCode = e.message.text.charCodeAt(i);
+        if(charCode < 48  || charCode > 57){
+            numFlug = false;
+            //１つでも数字以外の文字が見つかった場合for文終わり
+            break;
+        }
+    }
+    return numFlag;
+}
+
+async function recordStockPrice(e) {
+    const stockPrice = e.message.text;
+    const encryptedUserId = getEncryptedString(e.source.userId);
+    const yyyymmddampm = getCurrentTime();
+    const data = yyyymmddampm.split("/");
+    let x = "";
+    if (data[3] == "0") x = "午前"
+    else if(data[3] == "1") x = "午後"
+    const displayTimeMessage = yyyymmddampm.slice(0, -1) + x;
+    //株価を記録するためのSQL文
+    const query = `INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${encryptedUserId}', '${stockPrice}', '${yyyymmddampm}');`;
+
+    await fetchFromDatabase(query).catch((err) => {
+        console.log(`株価格納エラー${err}`);
+        isPushConfirmTemplate = false;
+        replyConfirmTemplate(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, JSON.stringify({name: "updateStockPrice", stockP: stockPrice, time: yyyymmddampm}), JSON.stringify({name: "updateNo"}));
+    })
+    replyMessage(e, `${displayTimeMessage}として株価${stockPrice}ベルを記録しただなも`);
 }
