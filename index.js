@@ -68,7 +68,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
                                 text: "どうもだなも!"
                             }));
                             break;
-                    
                         case /^しずえは$/.test(event.message.text): {
                             events_processed.push(client.replyMessage(event.replyToken, {
                                 type: "text",
@@ -102,7 +101,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             }
                             break;
                         } 
-
                         case /^余り物リスト$/.test(event.message.text): {
                             leftoverList(event);
                             break;
@@ -112,16 +110,14 @@ app.post('/callback', line.middleware(config), (req, res) => {
                             break;
                         }
                         case /.*削除/.test(event.message.text): {
-                            deleteLeftover(e);
+                            deleteLeftover(event);
                             break;
                         }
-
                         default :
                             if(event.source.groupId === undefined) {
                                 tempResponse(event, replyMessage);
                             } 
                             break;
-
                     }
                 }
             } else if(event.type == "postback") {
@@ -136,9 +132,8 @@ app.post('/callback', line.middleware(config), (req, res) => {
                 } 
             } else if(event.type == "join") {
                 const groupId = event.source.groupId;
-
             }
-
+            
             console.log(req.body);
             console.log(req.body.events[0].source)
         }
