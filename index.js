@@ -417,11 +417,13 @@ async function recordStockPrice(e) {
     //株価を記録するためのSQL文
     const query = `INSERT INTO stock_price_tb (user_id, stock_price, time) VALUES ('${encryptedUserId}', '${stockPrice}', '${yyyymmddampm}');`;
 
-    await fetchFromDatabase(query).catch((err) => {
+    fetchFromDatabase(query).then((res) => {
+        replyMessage(e, `${displayTimeMessage}として株価${stockPrice}ベルを記録しただなも`);
+    }).catch((err) => {
         console.log(err);
         isPushConfirmTemplate = false;
         replyConfirmTemplate(e, `今日の${x}の分の株価はすでに記録してあるだなも\n記録を上書きしてもいいだなもか？`, JSON.stringify({name: "updateStockPrice", stockP: stockPrice, time: yyyymmddampm}), JSON.stringify({name: "updateNo"}));
-        return;
+        return 
     })
-    replyMessage(e, `${displayTimeMessage}として株価${stockPrice}ベルを記録しただなも`);
+
 }
