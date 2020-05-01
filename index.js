@@ -340,10 +340,10 @@ async function tempResponse(e, callback) {
 }
 
 async function fetchFromDatabase(query) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         await dbclient.connect();
         const res = await dbclient.query(query).catch((err) => {
-            return reject(err);
+            reject(err);
         })
         console.log("データベースクエリ完了");
         console.log(res);
